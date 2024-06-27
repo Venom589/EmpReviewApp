@@ -25,6 +25,8 @@ module.exports.UserJwtVerify = async (req, res, next) => {
                     if(err){throw new Error("jwt not verified :: ")}
                 });
             next();
+        }else{
+            throw new Error("Jwt not found");
         }
     } catch (error) {
         console.log("jwt Error :: ",error);

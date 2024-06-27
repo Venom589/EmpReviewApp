@@ -14,10 +14,10 @@ class CommonService extends main_service{
             if(user == null){
                 throw new Error("User not found");
             }
-            if(data.role == "admin"){
+            if(user.role == "admin"){
                 token = jwt.sign({user:user.name},process.env.ADMIN_JWT_SECRET,{expiresIn:"1h"});
             }
-            if(data.role == "user"){
+            if(user.role == "user"){
                 token = jwt.sign({user:user.name},process.env.USER_JWT_SECRET,{expiresIn:"1h"});
             }
             if(token == null){
@@ -31,7 +31,7 @@ class CommonService extends main_service{
             }
             return userData;
         } catch (error) {
-            throw new Error("login service error :: ",error);
+            throw new Error("login service error ::"+ error.message,error);
         }
     }
     CheckUser = async(data) =>{
@@ -42,7 +42,7 @@ class CommonService extends main_service{
             }
             return userData;
         } catch (error) {
-            throw new Error("login service error :: ",error);
+            throw new Error("login service error ::"+ error.message,error);
         }
     }
     AllEmploye = async() =>{
@@ -57,14 +57,14 @@ class CommonService extends main_service{
                             $match: { employe_id: item._id }
                         },
                         {
-                            $count: "times"
+                            $count: "users"
                         }
                     ])
                 });
             }
             return allEmployes;
         } catch (error) {
-            throw new Error("All employe service error :: ",error);
+            throw new Error("All employe service error ::"+ error.message,error);
         }
     }
     SelectEmploye = async (data) => {
@@ -102,10 +102,38 @@ class CommonService extends main_service{
                     }
                 }
             ]);
+            // let anonymousReview = await this.review.aggregate([
+            //     {
+            //         $match: { employe_id: oneEmploye._id }
+            //     },
+            //     {
+            //         $project: {
+            //             "_id": 1,
+            //             "user": 1,
+            //             "employe_id": 1,
+            //             "review": 1,
+            //             // "reply": 1,
+            //             "created_at": {
+            //                 $dateToString: {
+            //                     date: "$createdAt",
+            //                     format: "%Y-%m-%dT%H:%M:%S",
+            //                     timezone: "Asia/Kolkata"
+            //                 }
+            //             },
+            //             "updated_at": {
+            //                 $dateToString: {
+            //                     date: "$updatedAt",
+            //                     format: "%Y-%m-%dT%H:%M:%S",
+            //                     timezone: "Asia/Kolkata"
+            //                 }
+            //             }
+            //         }
+            //     }
+            // ]);
             let selectedEmploye = { employe: oneEmploye, reviws: allReviews };
             return selectedEmploye;
         } catch (error) {
-            throw new Error("Select one Employee service error :: ", error);
+            throw new Error("Select one Employee service error ::"+ error.message, error);
         }
     }
 }

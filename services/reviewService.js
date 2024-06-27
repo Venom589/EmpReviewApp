@@ -10,7 +10,7 @@ const main_service = require('./mainService');
             if (checkUser == null) {
                 throw new Error("User not found :: ");
             }
-            let checkEmploye = await this.employe.findById(data.employe_id);
+            let checkEmploye = await this.employe.findOne({_id:data.employe_id});
             if (checkEmploye == null) {
                 throw new Error("Employe not found :: ");
             }
@@ -21,7 +21,7 @@ const main_service = require('./mainService');
             let reveiwData = {
                 user: checkUser._id,
                 employe_id: checkEmploye._id,
-                review: req.body.review,
+                review: data.review,
             }
             if (checkReviews.length == 0) {
                 checkUser.reviewed.push({
@@ -32,7 +32,7 @@ const main_service = require('./mainService');
             let newReview = await this.review.create(reveiwData);
             return newReview;
         } catch (error) {
-            throw new Error("Add review service error :: ");
+            throw new Error("Add review service error ::"+error.message, error);
         }
     }
     EditReview = async (data) => {
@@ -50,7 +50,7 @@ const main_service = require('./mainService');
                 await this.review.findByIdAndUpdate(checkReview._id, checkReview);
             }
         } catch (error) {
-            throw new Error("Edit review service error :: ");
+            throw new Error("Edit review service error ::"+error.message, error);
         }
     }
     DeleteReview = async (data) => {
@@ -64,12 +64,14 @@ const main_service = require('./mainService');
                 let checkReviews = await this.review.find({ employe_id: deleteReview.employe_id, user: (String)(deleteReview.user) });
                 if (checkReviews.length == 0 || checkReviews == null) {
                     let user = await this.user.findById(deleteReview.user);
-                    user.reviewed = user.reviewed.filter((x) => x == deleteReview.employe_id);
+                    user.reviewed = user.reviewed.filter((x) => x.employe_id != deleteReview.employe_id);
                     await this.user.findByIdAndUpdate(user._id, { reviewed: user.reviewed });
                 }
+            }else{
+                await this.review.findByIdAndDelete(deleteReview._id);
             }
         } catch (error) {
-            throw new Error("Delete review service error :: ");
+            throw new Error("Delete review service error ::"+error.message, error);
         }
     }
     ReplyReview = async (data) => {
@@ -89,7 +91,7 @@ const main_service = require('./mainService');
                 { _id: checkReviews._id }, { reply: data.reply }),
                 { timestamps: false };
         } catch (error) {
-            throw new Error("Reply review service error", error);
+            throw new Error("Reply review service error ::"+error.message, error);
         }
     }
     EditReply = async (data) => {
@@ -107,7 +109,7 @@ const main_service = require('./mainService');
             await this.review.findOneAndUpdate({ _id: checkReviews._id }, { reply: checkReviews.reply }),
                 { timestamps: false };
         } catch (error) {
-            throw new Error("Edit reply service error :: ");
+            throw new Error("Edit reply service error ::"+error.message, error);
         }
     }
     AddAnonymousReview = async(data) =>{
@@ -118,12 +120,12 @@ const main_service = require('./mainService');
             }
             let reveiwData = {
                 user: "anonymous",
-                employeId: checkEmploye._id,
+                employe_id: checkEmploye._id,
                 review: data.review,
             }
             await this.review.create(reveiwData);
         } catch (error) {
-            throw new Error("Add anonymous reviw service error :: ");
+            throw new Error("Add anonymous reviw service error ::"+error.message, error);
         }
     }
 }

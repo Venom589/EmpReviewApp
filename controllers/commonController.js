@@ -6,7 +6,7 @@ class CommonController extends main_controller {
     }
     AllEmployee = async (req, res) => {
         try {
-            let data = this.commonService.AllEmploye();
+            let data = await this.commonService.AllEmploye();
             res.status(200).json(data);
         } catch (error) {
             console.log("AllEmploye error :: ", error);
@@ -27,7 +27,7 @@ class CommonController extends main_controller {
     }
     AddReview = async (req, res) => {
         try {
-            if (!req.body.Employe_Id) {
+            if (!req.body.employe_id) {
                 throw new Error("Employe Id not found ::");
             }
             await this.reviewService.AddAnonymousReview(req.body);

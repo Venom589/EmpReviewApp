@@ -1,7 +1,7 @@
 const main_service = require('./mainService');
 const bcrypt = require('bcrypt');
 
-class AdminService extends main_service {
+class AdminService extends main_service{
     constructor() {
         super();
     }
@@ -22,7 +22,7 @@ class AdminService extends main_service {
             });
             return newEmploye;
         } catch (error) {
-            throw new Error("Create employe service error ::" + error.message, error);
+            throw new Error("Create employe service error ::"+ error.message, error);
         }
     }
     UpdateEmploye = async (data) => {
@@ -37,26 +37,28 @@ class AdminService extends main_service {
             let updatedEmploye = await this.employe.findByIdAndUpdate(oneEmploye._id, oneEmploye);
             return updatedEmploye;
         } catch (error) {
-            throw new Error("Update employe service error ::" + error.message, error);
+            throw new Error("Update employe service error ::"+ error.message, error);
         }
     }
     DeleteEmploye = async (data) => {
         try {
-            let oneEmploye = await this.employe.findById(data.employe_id);
+            let oneEmploye = await this.employe.findById(data.employe_id)
+                .select("_id name work_group position");
             if (oneEmploye == null) {
                 throw new Error("Employe not exist :: ")
             }
             let userReviews = await this.review.find({ employe_id: oneEmploye._id });
-            userReviews = userReviews.filter((reviews) => { reviews.user == "anonymous" });
+            userReviews = userReviews.filter((reviews) => { reviews.user != "anonymous" });
             for (let items of userReviews) {
                 let user = await this.user.findById(items.user);
-                user.reviewed.filter((x) => { x.EmployeId == items.employe_id });
+                user.reviewed = user.reviewed.filter((x) => { x.employe_id != items.employe_id });
                 await this.user.findByIdAndUpdate(user._id, { reviewed: user.reviewed });
             }
+            await this.review.deleteMany({employe_id:oneEmploye._id, user:'anonymous'});
             await this.review.deleteMany({ employe_id: oneEmploye._id });
             await this.employe.findByIdAndDelete(oneEmploye._id);
         } catch (error) {
-            throw new Error("Delete Employee service error ::" + error.message, error);
+            throw new Error("Delete Employee service error ::"+ error.message, error);
         }
     }
     AdminCreation = async (data) => {
@@ -74,7 +76,7 @@ class AdminService extends main_service {
             }
             await this.user.create(newUser);
         } catch (error) {
-            throw new Error("Admin Creation service error ::" + error.message, error);
+            throw new Error("Admin Creation service error ::"+ error.message, error);
         }
     }
 }

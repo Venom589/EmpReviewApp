@@ -68,7 +68,7 @@ class AdminController extends main_controller {
                 throw new Error("Employe Id not found ::");
             }
             let data = await this.reviewService.AddReview(req.body);
-            res.status(200).json(newReview);
+            res.status(200).json(data);
         } catch (error) {
             console.log("AddReview error :: ", error);
             res.sendStatus(400);

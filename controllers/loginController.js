@@ -14,7 +14,7 @@ class LoginController extends main_controller {
             }
             let user = await this.user.findOne({email:req.body.email});
             if(user != null){
-                throw new Error("User already exist");
+                throw new Error("User with this mail already exist");
             }
             if(req.body.role == "admin"){
                 await this.adminServis.AdminCreation(req.body);
@@ -24,7 +24,7 @@ class LoginController extends main_controller {
             }
             res.sendStatus(200);
         } catch (error) {
-            console.log("AllEmploye error :: ", error);
+            console.log("Sign up error :: ", error);
             res.sendStatus(400);
         }
     }
@@ -33,7 +33,6 @@ class LoginController extends main_controller {
             if(!req.body.email || !req.body.password || !req.body.role){
                 throw new Error("Request data not received :: ");
             }
-            console.log(req.body);
             let data = await this.commonService.Login(req.body);
             res.status(200).json(data);
         } catch (error) {

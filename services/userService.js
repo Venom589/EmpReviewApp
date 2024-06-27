@@ -10,24 +10,24 @@ class UserService extends main_service {
             let allUsers = await this.user.find().select("_id name email role reviewed");
             return allUsers;
         } catch (error) {
-            throw new Error("All user service Error :: ",error);
+            throw new Error("All user service Error ::"+ error.message,error);
         }
     }
     DeleteUser = async (data) => {
         try {
-            let checkUser = await this.findById(data.user_id);
+            let checkUser = await this.user.findById(data.user_id);
             if (checkUser == null) {
                 throw new Error("User not found");
             }
             await this.review.deleteMany({ user: (String)(checkUser._id) });
             await this.user.findByIdAndDelete(checkUser._id);
         } catch (error) {
-            throw new Error("Delete user service Error :: ",error);
+            throw new Error("Delete user service Error ::"+ error.message,error);
         }
     }
     ChangeName = async(data)=>{
         try {
-            let userData = await this.user.findOne({ Email: data.email });
+            let userData = await this.user.findOne({ email: data.email });
             if (userData == null) {
                 throw new Error("User not found :: ");
             }
@@ -36,7 +36,7 @@ class UserService extends main_service {
                 await this.user.findByIdAndUpdate(userData._id, { name: userData.name });
             }
         } catch (error) {
-            throw new Error("Change name service error :: ", error);
+            throw new Error("Change name service error ::"+ error.message, error);
         }
     }
     AddReview = async(data)=>{
@@ -49,13 +49,13 @@ class UserService extends main_service {
             if (checkEmploye == null) {
                 throw new Error("Employe not found :: ");
             }
-            let checkReviews = await this.review.find({ employe_id: data.employe_id, user: (String)(checkUser._id) });
+            let checkReviews = await this.review.find({ employe_id: data.employe_id, user:checkUser._id });
             if (checkReviews.length == 3) {
                 throw new Error("you have already review 3 time you cannot review now.");
             }
             let reveiwData = {
                 user: checkUser._id,
-                employeId: checkEmploye._id,
+                employe_id: checkEmploye._id,
                 review: data.review,
             }
             if (checkReviews.length == 0) {
@@ -66,7 +66,7 @@ class UserService extends main_service {
             }
             await this.review.create(reveiwData);
         } catch (error) {
-            throw new Error("Add review service error :: ", error);
+            throw new Error("Add review service error ::"+ error.message, error);
         }
     }
     EditReview = async(data)=>{
@@ -84,7 +84,7 @@ class UserService extends main_service {
                 await this.review.findByIdAndUpdate(checkReview._id, checkReview);
             }
         } catch (error) {
-            throw new Error("Edit review service error :: ", error);
+            throw new Error("Edit review service error ::"+ error.message, error);
         }
     }
     UserCreation = async(data) =>{
@@ -98,7 +98,7 @@ class UserService extends main_service {
             }
             await this.user.create(newUser);
         } catch (error) {
-            throw new Error("User creation service error :: ");
+            throw new Error("User creation service error ::"+ error.message, error);
         }
     }
 }

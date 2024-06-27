@@ -89,9 +89,80 @@ describe('Admin service', () => {
     });
 
     test("employee deletion test", async()=>{
-        employe.findById();
-        review.find();
-        user.findByIdAndUpdate();
-        let data={};
+        let employee = {
+            _id:"1",
+            name: "x",
+            work_group: "x",
+            position: "x",
+            __v:"0"
+        }
+        let reviews = [
+            {   
+                _id:"1",
+                __v:"0",
+                user:"anonymous",
+                employe_id:"1",
+                review:"review1",
+                reply:"reply1"
+            },
+            {   
+                _id:"2",
+                __v:"0",
+                user:"1",
+                employe_id:"1",
+                review:"review2",
+                reply:"reply3"
+            },
+            {
+                _id:"3",
+                __v:"0",
+                user:"2",
+                employe_id:"1",
+                review:"review3",
+                reply:"reply3"
+            },
+        ];
+        let users = [
+            {
+                _id:'1',
+                __v:"0",
+                name:"D",
+                email:"D@123.com",
+                password:"Dtest@123",
+                reviewed:[
+                    {Employe:"1"}
+                ],
+                role:"admin"
+            },
+            {
+                _id:'2',
+                __v:"0",
+                name:"f",
+                email:"f@123.com",
+                password:"ftest@123",
+                reviewed:[
+                    {Employe:"1"}
+                ],
+                role:"user"
+            },
+        ]
+        employe.findById.mockResolvedValue(employee);
+        review.find.mockResolvedValue(reviews);
+        user.findById.mockResolvedValue(id => Promise.resolve(users.find(x => x._id == id)));
+        // user.findByIdAndUpdate.mockResolvedValue();
+        review.deleteMany.mockResolvedValue(employee)
+        employe.findByIdAndDelete(employee);
+
+        //let filterSpy = jest.spyOn(Array.prototype , 'filter');
+        
+        let data={employe_id:"1"};
+        let result = await admin_service.DeleteEmploye(data);
+        expect(employe.findById).toHaveBeenCalled();
+        expect(employe.findById).toHaveBeenCalledWith(data.employe_id);
+        expect(filterSpy).toHaveBeenCalledTimes(3);
+        expect(review.find).toHaveBeenCalled();
+        // expect(user.findByIdAndUpdate).toHaveBeenCalled();
+        expect(user.findById).toHaveBeenCalledTimes(3);
+
     });
 });

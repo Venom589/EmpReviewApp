@@ -13,6 +13,7 @@ router.post('/login', isSchemaValid(common_validation.login),login_controller.Lo
 //router.post('/logout', isSchemaValid(commonValidation.signup), login_controller.Logout);
 router.get('/allEmploye', common_controller.AllEmployee);
 router.post('/oneEmploye', isSchemaValid(common_validation.select_employe),common_controller.SelectEmploye);
-router.post('/addEmploye', isSchemaValid(common_validation.add_review),common_controller.AddReview);
+router.post('/addReview', isSchemaValid(common_validation.add_review),common_controller.AddReview);
+
 
 module.exports = router;

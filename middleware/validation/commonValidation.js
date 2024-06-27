@@ -5,26 +5,33 @@ class CommonValidation {
 
     role = ["admin", "user"]
 
-    IsValidId = async (id) => {
+    IsValidId = (value, helpers) => {
         try {
-            if (!mongoose.isValidObjectId(id)) {
-                throw new Error("Id not valid");
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                throw new Error;
             }
+            return value;    
         } catch (error) {
-            throw error;
+            return helpers.error('any.invalid');
         }
     }
 
     select_employe = joi.object({
         employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id')
+            .custom(this.IsValidId, 'employe_id validation')
             .required()
+            .messages({
+                'any.invalid':'Enter an valid mongoose object id'
+            })
     });
 
     add_review = joi.object({
         employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id')
-            .required(),
+            .custom(this.IsValidId, 'employe_id vaidation')
+            .required()
+            .messages({
+                'any.invalid':'Enter an valid mongoose object id'
+            }),
 
         review: joi.string()
             .min(10)

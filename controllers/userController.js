@@ -31,7 +31,7 @@ class UserController extends main_controller {
                 throw new Error("Email is not received :: ");
             }
             await this.userService.ChangeName(req.body);
-            res.status(200).json(employees);
+            res.sendStatus(200);
         } catch (error) {
             console.log("AllEmploye error :: ", error);
             res.sendStatus(400);
@@ -39,10 +39,10 @@ class UserController extends main_controller {
     }
     AddReview = async (req, res) => {
         try {
-            if (!req.body.employe_Id) {
+            if (!req.body.employe_id) {
                 throw new Error("Employe Id not found ::");
             }
-            await this.userService.AddReview(req.body);
+            let data = await this.userService.AddReview(req.body);
             res.sendStatus(200);
         } catch (error) {
             console.log("AddReview error :: ", error);

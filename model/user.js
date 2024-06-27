@@ -20,7 +20,7 @@ const user_schema = new mongoose.Schema({
     },
     reviewed: [
         {
-            EmployeId: {
+            employe_id: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "employees"
             }

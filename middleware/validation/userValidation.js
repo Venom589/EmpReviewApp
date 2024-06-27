@@ -7,26 +7,33 @@ class UserValidation {
 
     position = ["Intern", "Junior", "Senior", "Head"];
 
-    IsValidId = async (id) => {
+    IsValidId = (value, helpers) => {
         try {
-            if (!mongoose.isValidObjectId(id)) {
-                throw new Error("Id not valid");
+            if (!mongoose.Types.ObjectId.isValid(value)) {
+                throw new Error;
             }
+            return value;    
         } catch (error) {
-            throw error;
+            return helpers.error('any.invalid');
         }
     }
 
     select_employe = joi.object({
         employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id')
+            .custom(this.IsValidId, 'employe_id validation')
             .required()
+            .messages({
+                'any.invalid':'Enter an valid mongoose object id'
+            })
     });
 
     add_review = joi.object({
         employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id')
-            .required(),
+            .custom(this.IsValidId, 'employe_id validation')
+            .required()
+            .messages({
+                'any.invalid':'Enter an valid mongoose object id'
+            }),
 
         email: joi.string()
             .email()
@@ -51,8 +58,11 @@ class UserValidation {
 
     edit_review = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id')
-            .required(),
+            .custom(this.IsValidId, 'review_id validation')
+            .required()
+            .messages({
+                'any.invalid':'Enter an valid mongoose object id'
+            }),
 
         email: joi.string()
             .email()
