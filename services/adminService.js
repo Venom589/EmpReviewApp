@@ -42,8 +42,7 @@ class AdminService extends main_service{
     }
     DeleteEmploye = async (data) => {
         try {
-            let oneEmploye = await this.employe.findById(data.employe_id)
-                .select("_id name work_group position");
+            let oneEmploye = await this.employe.findById(data.employe_id);
             if (oneEmploye == null) {
                 throw new Error("Employe not exist :: ")
             }

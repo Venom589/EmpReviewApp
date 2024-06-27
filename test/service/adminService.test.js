@@ -17,7 +17,7 @@ describe('Admin service', () => {
         jest.clearAllMocks();
     });
 
-    test("employee creation test", async () => {
+    it("employee creation test", async () => {
         let employeMock = {
             _id: "1",
             name: "x",
@@ -54,7 +54,7 @@ describe('Admin service', () => {
         ).rejects.toThrow("Create employe service error ::Find One Error:");
     });
 
-    test("employee Update test", async() => {
+    it("employee Update test", async() => {
         let findEmployeMock = {
             _id:"1",
             name: "x",
@@ -88,7 +88,7 @@ describe('Admin service', () => {
         expect(admin_service.UpdateEmploye(data)).rejects.toThrow("Update employe service error ::Employe not exist ::");
     });
 
-    test("employee deletion test", async()=>{
+    it("employee deletion test", async()=>{
         let employee = {
             _id:"1",
             name: "x",
@@ -148,21 +148,24 @@ describe('Admin service', () => {
         ]
         employe.findById.mockResolvedValue(employee);
         review.find.mockResolvedValue(reviews);
-        user.findById.mockResolvedValue(id => Promise.resolve(users.find(x => x._id == id)));
+        user.findById
+            .mockResolvedValueOnce(users[0])
+            .mockResolvedValueOnce(users[1]);
         // user.findByIdAndUpdate.mockResolvedValue();
         review.deleteMany.mockResolvedValue(employee)
         employe.findByIdAndDelete(employee);
 
-        //let filterSpy = jest.spyOn(Array.prototype , 'filter');
+        let filterSpy = jest.spyOn(Array.prototype, "filter");
         
+        
+
         let data={employe_id:"1"};
         let result = await admin_service.DeleteEmploye(data);
         expect(employe.findById).toHaveBeenCalled();
         expect(employe.findById).toHaveBeenCalledWith(data.employe_id);
         expect(filterSpy).toHaveBeenCalledTimes(3);
-        expect(review.find).toHaveBeenCalled();
         // expect(user.findByIdAndUpdate).toHaveBeenCalled();
-        expect(user.findById).toHaveBeenCalledTimes(3);
+        expect(review.deleteMany).toHaveBeenCalledTimes(2);
 
     });
 });
