@@ -19,7 +19,9 @@ class UserService extends main_service {
             if (checkUser == null) {
                 throw new Error("User not found");
             }
-            await this.review.deleteMany({ user: (String)(checkUser._id) });
+            if(checkUser.reviewed != null || checkUser.reviewed != undefined){
+                await this.review.deleteMany({ user: (String)(checkUser._id) });
+            }
             await this.user.findByIdAndDelete(checkUser._id);
         } catch (error) {
             throw new Error("Delete user service Error ::"+ error.message,error);
