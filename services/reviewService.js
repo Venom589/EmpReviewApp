@@ -59,8 +59,8 @@ const main_service = require('./mainService');
             if (deleteReview == null) {
                 throw new Error("Review not found :: ");
             }
-            await this.review.findByIdAndDelete(deleteReview._id);
             if (deleteReview.user != "anonymous") {
+                await this.review.findByIdAndDelete(deleteReview._id);
                 let checkReviews = await this.review.find({ employe_id: deleteReview.employe_id, user: (String)(deleteReview.user) });
                 if (checkReviews.length == 0 || checkReviews == null) {
                     let user = await this.user.findById(deleteReview.user);
@@ -77,7 +77,10 @@ const main_service = require('./mainService');
     ReplyReview = async (data) => {
         try {
             let checkUser = await this.user.findOne({ email: data.email });
-            if (checkUser.role != "admin" || checkUser == null) {
+            if(checkUser == null){
+                throw new Error("User not found");
+            }
+            if (checkUser.role != "admin") {
                 throw new Error("Admin not found");
             }
             let checkReviews = await this.review.findById(data.review_id);

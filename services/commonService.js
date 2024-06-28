@@ -1,5 +1,6 @@
 const main_service = require('./mainService');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 class CommonService extends main_service{
     constructor(){
@@ -9,10 +10,13 @@ class CommonService extends main_service{
     Login = async(data) =>{
         try {
             let token = null;
-            let user = await this.user.findOne({email:data.email})
-            .select("name email role");
+            let user = await this.user.findOne({email:data.email});
             if(user == null){
                 throw new Error("User not found");
+            }
+            let passCheck = bcrypt.compare(data.password,user.password);  
+            if(passCheck == false){
+                throw new Error("Incorrect Password");
             }
             if(user.role == "admin"){
                 token = jwt.sign({user:user.name},process.env.ADMIN_JWT_SECRET,{expiresIn:"1h"});
@@ -36,8 +40,8 @@ class CommonService extends main_service{
     }
     CheckUser = async(data) =>{
         try {
-            let userData = this.user.findOne({email:data.email});
-            if(user == null){
+            let userData = await this.user.findOne({email:data.email});
+            if(userData == null){
                 throw new Error("User not found :: ");
             }
             return userData;
@@ -47,7 +51,7 @@ class CommonService extends main_service{
     }
     AllEmploye = async() =>{
         try {
-            let employees = await this.employe.find().select(" _id name work_group position");
+            let employees = await this.employe.find();
             let allEmployes = [];
             for (let item of employees) {
                 allEmployes.push({
@@ -69,8 +73,7 @@ class CommonService extends main_service{
     }
     SelectEmploye = async (data) => {
         try {
-            let oneEmploye = await this.employe.findById(data.employe_id)
-                .select("_id name work_group position");
+            let oneEmploye = await this.employe.findById(data.employe_id);
             if (oneEmploye == null) {
                 throw new Error("Employe not exist :: ");
             }
@@ -102,34 +105,6 @@ class CommonService extends main_service{
                     }
                 }
             ]);
-            // let anonymousReview = await this.review.aggregate([
-            //     {
-            //         $match: { employe_id: oneEmploye._id }
-            //     },
-            //     {
-            //         $project: {
-            //             "_id": 1,
-            //             "user": 1,
-            //             "employe_id": 1,
-            //             "review": 1,
-            //             // "reply": 1,
-            //             "created_at": {
-            //                 $dateToString: {
-            //                     date: "$createdAt",
-            //                     format: "%Y-%m-%dT%H:%M:%S",
-            //                     timezone: "Asia/Kolkata"
-            //                 }
-            //             },
-            //             "updated_at": {
-            //                 $dateToString: {
-            //                     date: "$updatedAt",
-            //                     format: "%Y-%m-%dT%H:%M:%S",
-            //                     timezone: "Asia/Kolkata"
-            //                 }
-            //             }
-            //         }
-            //     }
-            // ]);
             let selectedEmploye = { employe: oneEmploye, reviws: allReviews };
             return selectedEmploye;
         } catch (error) {

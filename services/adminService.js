@@ -47,6 +47,10 @@ class AdminService extends main_service{
                 throw new Error("Employe not exist :: ")
             }
             let userReviews = await this.review.find({ employe_id: oneEmploye._id });
+            if(userReviews == null){
+                await this.employe.findByIdAndDelete(oneEmploye._id);
+                return;
+            }
             userReviews = userReviews.filter((reviews) => { reviews.user != "anonymous" });
             for (let items of userReviews) {
                 let user = await this.user.findById(items.user);
@@ -63,7 +67,7 @@ class AdminService extends main_service{
     AdminCreation = async (data) => {
         try {
             let findAdmin = await this.user.find({ role: "admin" });
-            if (findAdmin.length >= 1 && findAdmin != null) {
+            if ( findAdmin.length >= 1 && findAdmin != null) {
                 throw new Error("Admin already exist");
             }
             let encPassword = await bcrypt.hash(data.password, 15);
