@@ -49,7 +49,7 @@ class AdminValidation {
             }),
     });
 
-    editEmoloyee = joi.object({
+    editEmployee = joi.object({
         name: joi.string()
             .max(20)
             .min(4),

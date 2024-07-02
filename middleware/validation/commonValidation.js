@@ -27,7 +27,7 @@ class CommonValidation {
 
     addReview = joi.object({
         employee_id: joi.string()
-            .custom(this.isValidId, 'employee_id vaidation')
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'

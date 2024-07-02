@@ -1,20 +1,20 @@
-const employee = require('../model/employee');
-const review = require('../model/review');
-const user = require('../model/user');
-const admin_service = require('../services/adminService');
-const review_service = require('../services/reviewService');
-const user_service = require('../services/userService');
-const common_service = require('../services/commonService');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const AdminService = require('../services/adminService');
+const ReviewService = require('../services/reviewService');
+const UserService = require('../services/userService');
+const CommonService = require('../services/commonService');
 
 class MainController{
     constructor(){
-        this.review = review;
-        this.user = user;
-        this.employee = employee;
-        this.adminService = admin_service;
-        this.reviewService = review_service;
-        this.userService = user_service;
-        this.commonService = common_service;
+        this.Review = Review;
+        this.User = User;
+        this.Employee = Employee;
+        this.AdminService = AdminService;
+        this.ReviewService = ReviewService;
+        this.UserService = UserService;
+        this.CommonService = CommonService;
     }
 }
 

@@ -1,19 +1,19 @@
 const router = require('express').Router();
-const login_controller = require('../controllers/loginController');
-const common_controller = require('../controllers/commonController');
+const LoginController = require('../controllers/loginController');
+const CommonController = require('../controllers/commonController');
 const { isSchemaValid } = require('../middleware/joiValidator');
-const common_validation = require('../middleware/validation/commonValidation');
+const CommonValidation = require('../middleware/validation/commonValidation');
 const { adminJwtVerify , userJwtVerify } = require('../middleware/jwtVerify');
 
 router.use('/admin', adminJwtVerify,require('./adminRoute'));
 router.use('/user', userJwtVerify,require('./userRoute'));
 
-router.post('/signup', isSchemaValid(common_validation.signup),login_controller.signup);
-router.post('/login', isSchemaValid(common_validation.login),login_controller.login);
-//router.post('/logout', isSchemaValid(commonValidation.signup), login_controller.Logout);
-router.get('/allEmployee', common_controller.allEmployee);
-router.post('/oneEmployee', isSchemaValid(common_validation.selectEmployee),common_controller.selectEmployee);
-router.post('/addReview', isSchemaValid(common_validation.addReview),common_controller.addReview);
+router.post('/signup', isSchemaValid(CommonValidation.signup),LoginController.signup);
+router.post('/login', isSchemaValid(CommonValidation.login),LoginController.login);
+
+router.get('/allEmployee', CommonController.allEmployee);
+router.post('/oneEmployee', isSchemaValid(CommonValidation.selectEmployee),CommonController.selectEmployee);
+router.post('/addReview', isSchemaValid(CommonValidation.addReview),CommonController.addReview);
 
 
 module.exports = router;

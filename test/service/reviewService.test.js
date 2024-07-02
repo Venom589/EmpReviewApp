@@ -1,7 +1,7 @@
 const review_service = require('../../services/reviewService');
-const user = require('../../model/user');
-const review = require('../../model/review');
-const employee = require('../../model/employee');
+const User = require('../../model/user');
+const Review = require('../../model/review');
+const Employee = require('../../model/employee');
 
 jest.mock('../../model/user');
 jest.mock('../../model/review');
@@ -51,7 +51,7 @@ describe("Review service test", () => {
             {
                 _id: "1",
                 user: "1",
-                employe_id: "1",
+                employee_id: "1",
                 review: "Test Review1",
                 reply: "Test Reply1",
                 __v: "0"
@@ -59,7 +59,7 @@ describe("Review service test", () => {
             {
                 _id: "2",
                 user: "1",
-                employe_id: "1",
+                employee_id: "1",
                 review: "Test Review2",
                 reply: "Test Reply2",
                 __v: "0"
@@ -67,7 +67,7 @@ describe("Review service test", () => {
             {
                 _id: "3",
                 user: "1",
-                employe_id: "1",
+                employee_id: "1",
                 review: "Test Review3",
                 reply: "Test Reply3",
                 __v: "0"
@@ -78,31 +78,31 @@ describe("Review service test", () => {
             employee_id: "1",
             reivew: "test Review"
         }
-        user.findOne.mockResolvedValue(mockUser);
-        employee.findOne.mockResolvedValue(mockEmployee);
-        review.find.mockResolvedValue([]);
-        user.findByIdAndUpdate.mockResolvedValue();
+        User.findOne.mockResolvedValue(mockUser);
+        Employee.findOne.mockResolvedValue(mockEmployee);
+        Review.find.mockResolvedValue([]);
+        User.findByIdAndUpdate.mockResolvedValue();
         //add review
         const result = await review_service.addReview(data);
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(employee.findOne).toHaveBeenCalled();
-        expect(employee.findOne).toHaveBeenCalledWith({ _id: data.employee_id });
-        expect(review.find).toHaveBeenCalled();
-        expect(user.findByIdAndUpdate).toHaveBeenCalled();
-        expect(review.create).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(Employee.findOne).toHaveBeenCalled();
+        expect(Employee.findOne).toHaveBeenCalledWith({ _id: data.employee_id });
+        expect(Review.find).toHaveBeenCalled();
+        expect(User.findByIdAndUpdate).toHaveBeenCalled();
+        expect(Review.create).toHaveBeenCalled();
 
-        review.find.mockResolvedValue(mockReviews);
+        Review.find.mockResolvedValue(mockReviews);
         const result2 = await review_service.addReview(data);
-        expect(user.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(User.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
         //add review error
-        user.findOne.mockResolvedValueOnce();
+        User.findOne.mockResolvedValueOnce();
         await expect(review_service.addReview(data)).rejects
             .toThrow("Add review service error ::User not found :: ");
-        employee.findOne.mockResolvedValueOnce();
+        Employee.findOne.mockResolvedValueOnce();
         await expect(review_service.addReview(data)).rejects
             .toThrow("Add review service error ::Employee not found :: ");
-        review.find.mockResolvedValueOnce(errorMockReview);
+        Review.find.mockResolvedValueOnce(errorMockReview);
         await expect(review_service.addReview(data)).rejects
             .toThrow("Add review service error ::you have already review 3 time you cannot review now.");
 
@@ -139,25 +139,25 @@ describe("Review service test", () => {
             review_id: "1",
             review: "test update"
         }
-        user.findOne.mockResolvedValue(mockUser);
-        review.findOne.mockResolvedValue(mockReview);
-        review.findByIdAndUpdate.mockResolvedValue();
+        User.findOne.mockResolvedValue(mockUser);
+        Review.findOne.mockResolvedValue(mockReview);
+        Review.findByIdAndUpdate.mockResolvedValue();
         await review_service.editReview(data);
         //edit review 
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(review.findOne).toHaveBeenCalled();
-        expect(review.findByIdAndUpdate).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(Review.findOne).toHaveBeenCalled();
+        expect(Review.findByIdAndUpdate).toHaveBeenCalled();
         await review_service.editReview({
             email: "test1@xyz.com",
             review_id: "1",
         });
-        expect(review.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(Review.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
         //edit review error
-        user.findOne.mockResolvedValueOnce();
+        User.findOne.mockResolvedValueOnce();
         await expect(review_service.editReview(data)).rejects
             .toThrow("Edit review service error ::User not found :: ");
-        review.findOne.mockResolvedValueOnce();
+        Review.findOne.mockResolvedValueOnce();
         await expect(review_service.editReview(data)).rejects
             .toThrow("Edit review service error ::Review not found :: ");
 
@@ -192,28 +192,28 @@ describe("Review service test", () => {
         const data = {
             review_id: "1"
         }
-        review.findOne.mockResolvedValue(mockReview)
-        review.find.mockResolvedValue([]);
-        user.findById.mockResolvedValue(mockUser)
-        user.findByIdAndUpdate
+        Review.findOne.mockResolvedValue(mockReview)
+        Review.find.mockResolvedValue([]);
+        User.findById.mockResolvedValue(mockUser)
+        User.findByIdAndUpdate
         await review_service.deleteReview(data);
         //delete review
-        expect(review.findOne).toHaveBeenCalledTimes(1);
-        expect(review.findOne).toHaveBeenCalledWith({ _id: data.review_id });
-        expect(review.findByIdAndDelete).toHaveBeenCalledTimes(1);
-        expect(review.find).toHaveBeenCalledTimes(1);
-        expect(user.findById).toHaveBeenCalledTimes(1);
-        expect(user.findByIdAndUpdate).toHaveBeenCalledTimes(1);
+        expect(Review.findOne).toHaveBeenCalledTimes(1);
+        expect(Review.findOne).toHaveBeenCalledWith({ _id: data.review_id });
+        expect(Review.findByIdAndDelete).toHaveBeenCalledTimes(1);
+        expect(Review.find).toHaveBeenCalledTimes(1);
+        expect(User.findById).toHaveBeenCalledTimes(1);
+        expect(User.findByIdAndUpdate).toHaveBeenCalledTimes(1);
 
         mockReview.user = 'anonymous';
         await review_service.deleteReview(data);
-        expect(review.findOne).toHaveBeenCalledTimes(2);
-        expect(review.find).not.toHaveBeenCalledTimes(2);
-        expect(user.findById).not.toHaveBeenCalledTimes(2);
-        expect(user.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
-        expect(review.findByIdAndDelete).toHaveBeenCalledTimes(2);
+        expect(Review.findOne).toHaveBeenCalledTimes(2);
+        expect(Review.find).not.toHaveBeenCalledTimes(2);
+        expect(User.findById).not.toHaveBeenCalledTimes(2);
+        expect(User.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(Review.findByIdAndDelete).toHaveBeenCalledTimes(2);
         //delete review error
-        review.findOne.mockResolvedValueOnce();
+        Review.findOne.mockResolvedValueOnce();
         expect(review_service.deleteReview(data)).rejects
             .toThrow("Delete review service error ::Review not found :: ");
     });
@@ -248,20 +248,20 @@ describe("Review service test", () => {
             review_id: "1",
             reply: "test reply"
         }
-        user.findOne.mockResolvedValue(mockUser);
-        review.findById.mockResolvedValue(mockReview);
+        User.findOne.mockResolvedValue(mockUser);
+        Review.findById.mockResolvedValue(mockReview);
         await review_service.replyReview(data);
         //reply review
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(review.findById).toHaveBeenCalled();
-        expect(review.findById).toHaveBeenCalledWith(data.review_id);
-        expect(review.findOneAndUpdate).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(Review.findById).toHaveBeenCalled();
+        expect(Review.findById).toHaveBeenCalledWith(data.review_id);
+        expect(Review.findOneAndUpdate).toHaveBeenCalled();
         //reply review error
-        user.findOne.mockResolvedValueOnce();
+        User.findOne.mockResolvedValueOnce();
         expect(review_service.replyReview(data)).rejects
             .toThrow("Reply review service error ::User not found");
-        user.findOne.mockResolvedValueOnce({
+        User.findOne.mockResolvedValueOnce({
             _id: "1",
             name: "test1",
             password: "Test@1234",
@@ -270,11 +270,11 @@ describe("Review service test", () => {
         });
         expect(review_service.replyReview(data)).rejects
             .toThrow("Reply review service error ::Admin not found");
-        review.findById.mockResolvedValueOnce();
+        Review.findById.mockResolvedValueOnce();
         expect(review_service.replyReview(data)).rejects
             .toThrow("Reply review service error ::Review not found :: ");
-        mockReview.reply = "valuew";
-        review.findById.mockResolvedValueOnce(mockReview);
+        mockReview.reply = "value";
+        Review.findById.mockResolvedValueOnce(mockReview);
         expect(review_service.replyReview(data)).rejects
             .toThrow("Reply review service error ::You already replied this review");
     });
@@ -291,23 +291,23 @@ describe("Review service test", () => {
             review_id: "1",
             reply: "test edit reply"
         }
-        review.findOne.mockResolvedValue(mockReview);
+        Review.findOne.mockResolvedValue(mockReview);
         await review_service.editReply(data);
         //edit review         
-        expect(review.findOne).toHaveBeenCalled();
-        expect(review.findOne).toHaveBeenCalledWith({ _id: data.review_id });
-        expect(review.findOneAndUpdate).toHaveBeenCalled();
+        expect(Review.findOne).toHaveBeenCalled();
+        expect(Review.findOne).toHaveBeenCalledWith({ _id: data.review_id });
+        expect(Review.findOneAndUpdate).toHaveBeenCalled();
         //edit review error
-        review.findOne.mockResolvedValue();
+        Review.findOne.mockResolvedValue();
         await expect(review_service.editReply(data)).rejects
             .toThrow("Edit reply service error ::Review not found :: ");
         mockReview.reply = null;
-        review.findOne.mockResolvedValue(mockReview);
+        Review.findOne.mockResolvedValue(mockReview);
         await expect(review_service.editReply(data)).rejects
             .toThrow("Edit reply service error ::You have not replied this review");
     });
     it("Add anonymous review function", async () => {
-        const mockEmploye = {
+        const mockEmployee = {
             _id: "1",
             name: 'test1',
             work_group: 'test1',
@@ -319,16 +319,16 @@ describe("Review service test", () => {
             review: "test anonymous review"
         }
         //add anonymous review
-        employee.findById.mockResolvedValue(mockEmploye);
+        Employee.findById.mockResolvedValue(mockEmployee);
         await review_service.addAnonymousReview(data);
-        expect(employee.findById).toHaveBeenCalled();
-        expect(employee.findById).toHaveBeenCalledWith(data.employee_id);
-        expect(review.create).toHaveBeenCalled();
+        expect(Employee.findById).toHaveBeenCalled();
+        expect(Employee.findById).toHaveBeenCalledWith(data.employee_id);
+        expect(Review.create).toHaveBeenCalled();
         //add anonymous review error
-        employee.findById.mockResolvedValueOnce();
+        Employee.findById.mockResolvedValueOnce();
         expect(review_service.addAnonymousReview(data)).rejects
             .toThrow("Add anonymous review service error ::Employee not found :: ");
-        review.create.mockRejectedValue(new Error("Database error"));
+        Review.create.mockRejectedValue(new Error("Database error"));
         expect(review_service.addAnonymousReview(data)).rejects
             .toThrow("Add anonymous review service error ::Database error");
         });

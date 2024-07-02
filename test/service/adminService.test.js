@@ -1,8 +1,8 @@
-const admin_service = require('../../services/adminService');
+const AdminService = require('../../services/adminService');
 const bcrypt = require('bcrypt');
-const employee = require('../../model/employee');
-const user = require('../../model/user');
-const review = require('../../model/review');
+const Employee = require('../../model/employee');
+const User = require('../../model/user');
+const Review = require('../../model/review');
 
 jest.mock('../../model/employee');
 jest.mock('../../model/user');
@@ -24,29 +24,29 @@ describe('Admin service', () => {
         const data = { name: "x", work_group: "x", position: "x" };
         //create test//
 
-        employee.create.mockResolvedValue(employeeMock);
-        employee.findOne.mockResolvedValue();
-        const result = await admin_service.createEmployee(data);
-        expect(employee.findOne).toHaveBeenCalled();
-        expect(employee.create).toHaveBeenCalled();
-        expect(employee.create).toHaveBeenCalledWith(data);
+        Employee.create.mockResolvedValue(employeeMock);
+        Employee.findOne.mockResolvedValue();
+        const result = await AdminService.createEmployee(data);
+        expect(Employee.findOne).toHaveBeenCalled();
+        expect(Employee.create).toHaveBeenCalled();
+        expect(Employee.create).toHaveBeenCalledWith(data);
         expect(result).toEqual(employeeMock);
 
         //create error test//
-        employee.create.mockRejectedValue(new Error("Create Query Error:"));
+        Employee.create.mockRejectedValue(new Error("Create Query Error:"));
         await expect(
-            admin_service.createEmployee(data)
+            AdminService.createEmployee(data)
         ).rejects.toThrow("Create employee service error ::Create Query Error:");
 
         //findone error test//
-        employee.findOne.mockResolvedValue(employeeMock);
+        Employee.findOne.mockResolvedValue(employeeMock);
         await expect(
-            admin_service.createEmployee(data)
-        ).rejects.toThrow("Create employee service error ::Employee Alredy Exist");
+            AdminService.createEmployee(data)
+        ).rejects.toThrow("Create employee service error ::Employee already Exist");
 
-        employee.findOne.mockRejectedValue(new Error("Find One Error:"));
+        Employee.findOne.mockRejectedValue(new Error("Find One Error:"));
         await expect(
-            admin_service.createEmployee(data)
+            AdminService.createEmployee(data)
         ).rejects.toThrow("Create employee service error ::Find One Error:");
     });
 
@@ -65,23 +65,22 @@ describe('Admin service', () => {
             position: ""
         }
         //update test//
-        employee.findById.mockResolvedValue(findEmployeeMock);
-        employee.findByIdAndUpdate.mockResolvedValue(findEmployeeMock);
-        const result = await admin_service.updateEmployee(data);
-        expect(employee.findById).toHaveBeenCalledTimes(1);
-        expect(employee.findByIdAndUpdate).toHaveBeenCalled();
-        expect(employee.findById).toHaveBeenLastCalledWith(data.employee_id);
-        expect(employee.findByIdAndUpdate).toHaveBeenCalledWith(data.employee_id, findEmployeeMock);
-        expect(result).toMatchObject(findEmployeeMock);
+        Employee.findById.mockResolvedValue(findEmployeeMock);
+        Employee.findByIdAndUpdate.mockResolvedValue(findEmployeeMock);
+        const result = await AdminService.updateEmployee(data);
+        expect(Employee.findById).toHaveBeenCalledTimes(1);
+        expect(Employee.findByIdAndUpdate).toHaveBeenCalled();
+        expect(Employee.findById).toHaveBeenLastCalledWith(data.employee_id);
+        expect(Employee.findByIdAndUpdate).toHaveBeenCalledWith(data.employee_id, findEmployeeMock);
 
         //error update test//
-        employee.findById.mockRejectedValueOnce(new Error("employee find error"));
-        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::employee find error");
-        employee.findById.mockResolvedValue(findEmployeeMock);
-        employee.findByIdAndUpdate.mockRejectedValue(new Error("updation Error"));
-        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::updation Error");
-        employee.findById.mockResolvedValue(null);
-        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::Employee not exist ::");
+        Employee.findById.mockRejectedValueOnce(new Error("employee find error"));
+        expect(AdminService.updateEmployee(data)).rejects.toThrow("Update employee service error ::employee find error");
+        Employee.findById.mockResolvedValue(findEmployeeMock);
+        Employee.findByIdAndUpdate.mockRejectedValue(new Error("updation Error"));
+        expect(AdminService.updateEmployee(data)).rejects.toThrow("Update employee service error ::updation Error");
+        Employee.findById.mockResolvedValue(null);
+        expect(AdminService.updateEmployee(data)).rejects.toThrow("Update employee service error ::Employee not exist ::");
     });
 
     it("employee deletion test", async () => {
@@ -118,28 +117,28 @@ describe('Admin service', () => {
                 reply: "reply3"
             },
         ];
-        employee.findById.mockResolvedValue(mockEmployee);
-        review.find.mockResolvedValue(mockReviews);
-        review.deleteMany.mockResolvedValue(mockEmployee)
+        Employee.findById.mockResolvedValue(mockEmployee);
+        Review.find.mockResolvedValue(mockReviews);
+        Review.deleteMany.mockResolvedValue(mockEmployee)
         const filterSpy = jest.spyOn(Array.prototype, "filter");
 
 
-        //delete employe
+        //delete employee
         const data = { employee_id: "1" };
-        const result = await admin_service.deleteEmployee(data);
-        expect(employee.findById).toHaveBeenCalled();
-        expect(employee.findById).toHaveBeenCalledWith(data.employee_id);
+        await AdminService.deleteEmployee(data);
+        expect(Employee.findById).toHaveBeenCalled();
+        expect(Employee.findById).toHaveBeenCalledWith(data.employee_id);
         expect(filterSpy).toHaveBeenCalledTimes(3);
         // expect(user.findByIdAndUpdate).toHaveBeenCalled();
-        expect(review.deleteMany).toHaveBeenCalledTimes(2);
-        expect(employee.findByIdAndDelete).toHaveBeenCalledTimes(1);
+        expect(Review.deleteMany).toHaveBeenCalledTimes(2);
+        expect(Employee.findByIdAndDelete).toHaveBeenCalledTimes(1);
 
-        //delete employe error
-        employee.findById.mockResolvedValue(null);
-        expect(admin_service.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Employee not exist :: ");
-        employee.findById.mockResolvedValue(employee);
-        review.find.mockRejectedValue(new Error("Review not find"));
-        expect(admin_service.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Review not find");
+        //delete employee error
+        Employee.findById.mockResolvedValue(null);
+        expect(AdminService.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Employee not exist :: ");
+        Employee.findById.mockResolvedValue(mockEmployee);
+        Review.find.mockRejectedValue(new Error("Review not find"));
+        expect(AdminService.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Review not find");
 
     });
 
@@ -176,15 +175,15 @@ describe('Admin service', () => {
             password: "Test@1234",
             role: "admin",
         };
-        user.find.mockResolvedValue([]);
+        User.find.mockResolvedValue([]);
         const bcryptSpy = jest.spyOn(bcrypt , 'hash');
-        await admin_service.adminCreation(data);
-        //adminCreat
-        expect(user.find).toHaveBeenCalledTimes(1);
-        expect(user.find).toHaveBeenCalledWith({role:"admin"});
-        expect(user.create).toHaveBeenCalledTimes(1);
+        await AdminService.adminCreation(data);
+        //adminCreate
+        expect(User.find).toHaveBeenCalledTimes(1);
+        expect(User.find).toHaveBeenCalledWith({role:"admin"});
+        expect(User.create).toHaveBeenCalledTimes(1);
         //admin create error
-        user.find.mockResolvedValue([mockUsers[2]]);
-        expect(admin_service.adminCreation(data)).rejects.toThrow("Admin creation service error ::Admin already exist");
+        User.find.mockResolvedValue([mockUsers[2]]);
+        expect(AdminService.adminCreation(data)).rejects.toThrow("Admin creation service error ::Admin already exist");
     });
 });

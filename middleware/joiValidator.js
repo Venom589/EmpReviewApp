@@ -1,7 +1,7 @@
 module.exports.isSchemaValid = (schema) =>{
     try {
         return (req, res, next) => {
-            const is_valid = schema.validate(req.body,{abordEarly:false});
+            const is_valid = schema.validate(req.body,{abortEarly:false});
             if(!is_valid.error){
                 next()
             }else{

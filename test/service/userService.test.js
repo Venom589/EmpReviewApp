@@ -1,7 +1,7 @@
 const user_service = require('../../services/userService');
-const user = require('../../model/user');
-const review = require('../../model/review');
-const employee = require('../../model/employee');
+const User = require('../../model/user');
+const Review = require('../../model/review');
+const Employee = require('../../model/employee');
 
 jest.mock('../../model/user');
 jest.mock('../../model/review');
@@ -47,24 +47,24 @@ describe('User service ', () => {
                 ]
             }
         ]
-        user.find.mockReturnValue({
+        User.find.mockReturnValue({
             select: jest.fn().mockResolvedValue(mockUsers)
         });
         const result = await user_service.allUsers();
         //all users
-        expect(user.find).toHaveBeenCalled();
-        expect(user.find().select).toHaveBeenCalled();
-        expect(user.find().select).toHaveBeenCalledWith("_id name email role reviewed");
+        expect(User.find).toHaveBeenCalled();
+        expect(User.find().select).toHaveBeenCalled();
+        expect(User.find().select).toHaveBeenCalledWith("_id name email role reviewed");
         expect(result).toEqual(mockUsers);
         //all users error
-        user.find.mockReturnValue({
+        User.find.mockReturnValue({
             select: jest.fn().mockRejectedValue(new Error("Database error"))
         });
         await expect(user_service.allUsers()).rejects.toThrow("All user service Error ::Database error");
 
     });
     it("Delete User test", async () => {
-        const mockuser = {
+        const mockUser = {
             _id: "1",
             name: "test1",
             password: "Test@1234",
@@ -75,25 +75,25 @@ describe('User service ', () => {
         const data = {
             user_id: "1"
         }
-        user.findById.mockResolvedValue(mockuser);
-        review.deleteMany.mockResolvedValue();
-        user.findByIdAndDelete.mockResolvedValue();
+        User.findById.mockResolvedValue(mockUser);
+        Review.deleteMany.mockResolvedValue();
+        User.findByIdAndDelete.mockResolvedValue();
         await user_service.deleteUser(data);
         //delete user
-        expect(user.findById).toHaveBeenCalled();
-        expect(user.findById).toHaveBeenCalledWith(data.user_id);
-        expect(user.findByIdAndDelete).toHaveBeenCalled();
-        mockuser.reviewed = null;
-        user.findById.mockResolvedValue(mockuser);
+        expect(User.findById).toHaveBeenCalled();
+        expect(User.findById).toHaveBeenCalledWith(data.user_id);
+        expect(User.findByIdAndDelete).toHaveBeenCalled();
+        mockUser.reviewed = null;
+        User.findById.mockResolvedValue(mockUser);
         await user_service.deleteUser(data);
-        expect(user.findById).toHaveBeenCalledTimes(2);
-        expect(review.deleteMany).not.toHaveBeenCalledTimes(2);
-        expect(user.findByIdAndDelete).toHaveBeenCalledTimes(2);
+        expect(User.findById).toHaveBeenCalledTimes(2);
+        expect(Review.deleteMany).not.toHaveBeenCalledTimes(2);
+        expect(User.findByIdAndDelete).toHaveBeenCalledTimes(2);
         //delete user error
-        user.findById.mockResolvedValue();
+        User.findById.mockResolvedValue();
         await expect(user_service.deleteUser(data)).rejects
             .toThrow("Delete user service Error ::User not found");
-        user.findById.mockResolvedValueOnce({
+        User.findById.mockResolvedValueOnce({
             _id: "1",
             name: "test1",
             password: "Test@1234",
@@ -103,14 +103,14 @@ describe('User service ', () => {
         });
         await expect(user_service.deleteUser(data)).rejects
             .toThrow("Delete user service Error ::Cannot delete admin user");
-        user.findByIdAndDelete.mockRejectedValue(new Error("Data not deleted"));
-        user.findById.mockResolvedValue(mockuser);
+        User.findByIdAndDelete.mockRejectedValue(new Error("Data not deleted"));
+        User.findById.mockResolvedValue(mockUser);
         await expect(user_service.deleteUser(data)).rejects
             .toThrow("Delete user service Error ::Data not deleted");
 
     });
     it("Change Name test", async () => {
-        const mockuser = {
+        const mockUser = {
             _id: "1",
             name: "test1",
             password: "Test@1234",
@@ -122,28 +122,28 @@ describe('User service ', () => {
             name: "test",
             email: "test1@xyz.com"
         }
-        user.findOne.mockResolvedValue(mockuser);
-        user.findByIdAndUpdate.mockResolvedValue();
+        User.findOne.mockResolvedValue(mockUser);
+        User.findByIdAndUpdate.mockResolvedValue();
         await user_service.changeName(data);
         //change name
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(user.findByIdAndUpdate).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(User.findByIdAndUpdate).toHaveBeenCalled();
         await user_service.changeName({ email: "test1@xyz.com" });
-        expect(user.findOne).toHaveBeenCalledTimes(2);
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(user.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(User.findOne).toHaveBeenCalledTimes(2);
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(User.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
         //change name error
-        user.findOne.mockResolvedValue();
+        User.findOne.mockResolvedValue();
         expect(user_service.changeName(data)).rejects
             .toThrow("Change name service error ::User not found :: ");
-        user.findOne.mockResolvedValue(mockuser);
-        user.findByIdAndUpdate.mockRejectedValue(new Error("Data not update"));
+        User.findOne.mockResolvedValue(mockUser);
+        User.findByIdAndUpdate.mockRejectedValue(new Error("Data not update"));
         expect(user_service.changeName(data)).rejects
             .toThrow("Change name service error ::Data not update");
     });
     it("Add Review test", async () => {
-        const mockuser = {
+        const mockUser = {
             _id: "1",
             name: "test1",
             password: "Test@1234",
@@ -207,33 +207,33 @@ describe('User service ', () => {
         const data = {
             email: "test1@xyz.com",
             employee_id: "1",
-            reivew: "test Review"
+            review: "test Review"
         }
-        user.findOne.mockResolvedValue(mockuser);
-        employee.findById.mockResolvedValue(mockEmployee);
-        review.find.mockResolvedValue([]);
-        user.findByIdAndUpdate.mockResolvedValue();
+        User.findOne.mockResolvedValue(mockUser);
+        Employee.findById.mockResolvedValue(mockEmployee);
+        Review.find.mockResolvedValue([]);
+        User.findByIdAndUpdate.mockResolvedValue();
         //add review
         await user_service.addReview(data);
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(employee.findById).toHaveBeenCalled();
-        expect(employee.findById).toHaveBeenCalledWith(data.employee_id);
-        expect(review.find).toHaveBeenCalled();
-        expect(user.findByIdAndUpdate).toHaveBeenCalled();
-        expect(review.create).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(Employee.findById).toHaveBeenCalled();
+        expect(Employee.findById).toHaveBeenCalledWith(data.employee_id);
+        expect(Review.find).toHaveBeenCalled();
+        expect(User.findByIdAndUpdate).toHaveBeenCalled();
+        expect(Review.create).toHaveBeenCalled();
 
-        review.find.mockResolvedValue(mockReviews);
+        Review.find.mockResolvedValue(mockReviews);
         await user_service.addReview(data);
-        expect(user.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(User.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
         //add review error
-        user.findOne.mockResolvedValueOnce();
+        User.findOne.mockResolvedValueOnce();
         await expect(user_service.addReview(data)).rejects
             .toThrow("Add review service error ::User not found :: ");
-        employee.findById.mockResolvedValueOnce();
+        Employee.findById.mockResolvedValueOnce();
         await expect(user_service.addReview(data)).rejects
             .toThrow("Add review service error ::Employee not found :: ");
-        review.find.mockResolvedValueOnce(errorMockReview);
+        Review.find.mockResolvedValueOnce(errorMockReview);
         await expect(user_service.addReview(data)).rejects
             .toThrow("Add review service error ::you have already review 3 time you cannot review now.");
     });
@@ -270,24 +270,24 @@ describe('User service ', () => {
             review: "the edit test"
         }
 
-        user.findOne.mockResolvedValue(mockUser)
-        review.findOne.mockResolvedValue(mockReview);
+        User.findOne.mockResolvedValue(mockUser)
+        Review.findOne.mockResolvedValue(mockReview);
         await user_service.editReview(data);
         //edit review
-        expect(user.findOne).toHaveBeenCalled();
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
-        expect(review.findOne).toHaveBeenCalled();
-        expect(review.findByIdAndUpdate).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalled();
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
+        expect(Review.findOne).toHaveBeenCalled();
+        expect(Review.findByIdAndUpdate).toHaveBeenCalled();
         await user_service.editReview({
             email: "test1@xyz.com",
             review_id: "1",
         });
-        expect(review.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
+        expect(Review.findByIdAndUpdate).not.toHaveBeenCalledTimes(2);
         //Edit review error
-        user.findOne.mockResolvedValueOnce();
+        User.findOne.mockResolvedValueOnce();
         await expect(user_service.editReview(data)).rejects
             .toThrow("Edit review service error ::User not found :: ");
-        review.findOne.mockResolvedValueOnce();
+        Review.findOne.mockResolvedValueOnce();
         await expect(user_service.editReview(data)).rejects
             .toThrow("Edit review service error ::Review not found :: ");
     });
@@ -300,9 +300,9 @@ describe('User service ', () => {
         }
         await user_service.userCreation(data);
         //user creation
-        expect(user.create).toHaveBeenCalled();
+        expect(User.create).toHaveBeenCalled();
         //user creation error
-        user.create.mockRejectedValueOnce(new Error("User creation error"));
+        User.create.mockRejectedValueOnce(new Error("User creation error"));
         expect(user_service.userCreation(data)).rejects
             .toThrow("User creation service error ::User creation error");
     });

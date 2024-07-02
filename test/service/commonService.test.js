@@ -1,7 +1,7 @@
-const common_service = require('../../services/commonService');
-const user = require('../../model/user');
-const employee = require('../../model/employee');
-const review = require('../../model/review');
+const CommonService = require('../../services/commonService');
+const User = require('../../model/user');
+const Employee = require('../../model/employee');
+const Review = require('../../model/review');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -11,7 +11,7 @@ jest.mock('../../model/review');
 jest.mock('jsonwebtoken');
 jest.mock('bcrypt');
 
-describe("Common_service", () => {
+describe("CommonService", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -30,12 +30,12 @@ describe("Common_service", () => {
             __v: "0"
         }
         //login user test
-        user.findOne.mockResolvedValue(mockedUser);
+        User.findOne.mockResolvedValue(mockedUser);
         jwt.sign.mockResolvedValue();
-        const result = await common_service.login(adminData);
+        const result = await CommonService.login(adminData);
 
-        expect(user.findOne).toHaveBeenCalledTimes(1);
-        expect(user.findOne).toHaveBeenCalledWith({ email: adminData.email });
+        expect(User.findOne).toHaveBeenCalledTimes(1);
+        expect(User.findOne).toHaveBeenCalledWith({ email: adminData.email });
         expect(jwt.sign).toHaveBeenCalledTimes(1);
         expect(result).toMatchObject({
             name: mockedUser.name,
@@ -45,12 +45,12 @@ describe("Common_service", () => {
         //login admin test
         adminData.role = "user";
         mockedUser.role = "user";
-        user.findOne.mockResolvedValue(mockedUser);
+        User.findOne.mockResolvedValue(mockedUser);
         jwt.sign.mockResolvedValue();
-        const result2 = await common_service.login(adminData);
+        const result2 = await CommonService.login(adminData);
 
-        expect(user.findOne).toHaveBeenCalledTimes(2);
-        expect(user.findOne).toHaveBeenCalledWith({ email: adminData.email });
+        expect(User.findOne).toHaveBeenCalledTimes(2);
+        expect(User.findOne).toHaveBeenCalledWith({ email: adminData.email });
         expect(jwt.sign).toHaveBeenCalledTimes(2);
         expect(result2).toMatchObject({
             name: mockedUser.name,
@@ -59,11 +59,11 @@ describe("Common_service", () => {
         });
 
         //error test
-        user.findOne.mockResolvedValue();
-        expect(common_service.login(adminData)).rejects.toThrow("login service error ::User not found");
+        User.findOne.mockResolvedValue();
+        expect(CommonService.login(adminData)).rejects.toThrow("login service error ::User not found");
         mockedUser.role = "";
-        user.findOne.mockResolvedValue(mockedUser);
-        expect(common_service.login(adminData)).rejects.toThrow("login service error ::Token not created :: ");
+        User.findOne.mockResolvedValue(mockedUser);
+        expect(CommonService.login(adminData)).rejects.toThrow("login service error ::Token not created :: ");
 
 
     });
@@ -81,14 +81,14 @@ describe("Common_service", () => {
             __v: "0"
         }
         //check user
-        user.findOne.mockResolvedValue(mockedUser);
-        const result = await common_service.checkUser(data);
-        expect(user.findOne).toHaveBeenCalledTimes(1);
-        expect(user.findOne).toHaveBeenCalledWith({ email: data.email });
+        User.findOne.mockResolvedValue(mockedUser);
+        const result = await CommonService.checkUser(data);
+        expect(User.findOne).toHaveBeenCalledTimes(1);
+        expect(User.findOne).toHaveBeenCalledWith({ email: data.email });
         expect(result).toEqual(mockedUser);
         //check user errors
-        user.findOne.mockResolvedValue();
-        expect(common_service.checkUser(data)).rejects.toThrow("Check user service error ::User not found ::");
+        User.findOne.mockResolvedValue();
+        expect(CommonService.checkUser(data)).rejects.toThrow("Check user service error ::User not found ::");
     });
 
     it("All employee function", async () => {
@@ -111,13 +111,13 @@ describe("Common_service", () => {
             { count: 2 },
             { count: 2 }
         ];
-        employee.find.mockResolvedValue(mockEmployee);
-        review.aggregate.mockResolvedValueOnce(mockReview[0])
+        Employee.find.mockResolvedValue(mockEmployee);
+        Review.aggregate.mockResolvedValueOnce(mockReview[0])
             .mockResolvedValueOnce(mockReview[1]);
-        const result = await common_service.allEmployee();
-        //all employe
-        expect(employee.find).toHaveBeenCalled();
-        expect(review.aggregate).toHaveBeenCalledTimes(2);
+        const result = await CommonService.allEmployee();
+        //all employee
+        expect(Employee.find).toHaveBeenCalled();
+        expect(Review.aggregate).toHaveBeenCalledTimes(2);
         expect(result).toEqual([
             {
                 employee: mockEmployee[0],
@@ -130,8 +130,8 @@ describe("Common_service", () => {
         ]);
 
         //error
-        employee.find.mockRejectedValue(new Error('Database error'));
-        await expect(common_service.allEmployee()).rejects
+        Employee.find.mockRejectedValue(new Error('Database error'));
+        await expect(CommonService.allEmployee()).rejects
             .toThrow('All employee service error ::Database error');
 
     });
@@ -166,21 +166,21 @@ describe("Common_service", () => {
             employee_id:"1"
         }
 
-        employee.findById.mockResolvedValue(mockEmployee);
-        review.aggregate.mockResolvedValue(mockReview);
-        const result = await common_service.selectEmployee(data);
-        //select employe
-        expect(employee.findById).toHaveBeenCalled();
-        expect(review.aggregate).toHaveBeenCalledTimes(1);
+        Employee.findById.mockResolvedValue(mockEmployee);
+        Review.aggregate.mockResolvedValue(mockReview);
+        const result = await CommonService.selectEmployee(data);
+        //select employee
+        expect(Employee.findById).toHaveBeenCalled();
+        expect(Review.aggregate).toHaveBeenCalledTimes(1);
         expect(result).toEqual(
             {
                 employee:mockEmployee,
-                reviws: mockReview
+                review: mockReview
             }
         );
-        //select employe error
-        employee.findById.mockResolvedValue();
-        expect(common_service.selectEmployee(data)).rejects
+        //select employee error
+        Employee.findById.mockResolvedValue();
+        expect(CommonService.selectEmployee(data)).rejects
             .toThrow("Select one employee service error ::Employee not exist ::");
     });
 });

@@ -1,63 +1,65 @@
-const main_service = require('./mainService');
+const MainService = require('./mainService');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const review = require('../model/review');
 
-class CommonService extends main_service{
-    constructor(){
+class CommonService extends MainService {
+    constructor() {
         super();
     }
-    
-    login = async(data) =>{
+
+    async login(data) {
         try {
             let token = null;
-            const user = await this.user.findOne({email:data.email});
-            if(user == null){
+            const user = await this.User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found");
             }
-            const passCheck = bcrypt.compare(data.password,user.password);  
-            if(passCheck == false){
+            const passCheck = bcrypt.compare(data.password, user.password);
+            if (passCheck == false) {
                 throw new Error("Incorrect Password");
             }
-            if(user.role == "admin"){
-                token = jwt.sign({user:user.name},process.env.ADMIN_JWT_SECRET,{expiresIn:"1h"});
+            if (user.role == this.roles.ADMIN) {
+                token = jwt.sign({ user: user.name }, process.env.ADMIN_JWT_SECRET, { expiresIn: "1h" });
             }
-            if(user.role == "user"){
-                token = jwt.sign({user:user.name},process.env.USER_JWT_SECRET,{expiresIn:"1h"});
+            if (user.role == this.roles.USER) {
+                token = jwt.sign({ user: user.name }, process.env.USER_JWT_SECRET, { expiresIn: "1h" });
             }
-            if(token == null){
+            if (token == null) {
                 throw new Error("Token not created :: ");
             }
             const userData = {
-                "name":user.name,
-                "email":user.email,
-                "role":user.role,
-                "token":token
+                "name": user.name,
+                "email": user.email,
+                "role": user.role,
+                "token": token
             }
             return userData;
         } catch (error) {
-            console.log("login service error ::",error);
-            throw new Error("login service error ::"+ error.message,error);
+            console.log("login service error ::", error);
+            throw new Error(`login service error ::${error.message}`, error);
         }
     }
-    checkUser = async(data) =>{
+    async checkUser(data) {
         try {
-            const user = await this.user.findOne({email:data.email});
-            if(user == null){
+            const user = await this.User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found :: ");
             }
             return user;
         } catch (error) {
-            throw new Error("Check user service error ::"+ error.message,error);
+            console.log("Check user service error ::", error);
+            throw new Error(`Check user service error ::${error.message}`, error);
         }
     }
-    allEmployee = async() =>{
+    async allEmployee() {
         try {
-            const employees = await this.employee.find();
-            let allEmployees = [];
+            const employees = await this.Employee.find();
+            const allEmployees = [];
             for (let item of employees) {
                 allEmployees.push({
                     employee: item,
-                    reviews: await this.review.aggregate([
+                    reviews: await this.Review.aggregate([
                         {
                             $match: { employee_id: item._id }
                         },
@@ -69,17 +71,17 @@ class CommonService extends main_service{
             }
             return allEmployees;
         } catch (error) {
-            console.log("All employee service error ::",error);
-            throw new Error("All employee service error ::"+ error.message,error);
+            console.log("All employee service error ::", error);
+            throw new Error(`All employee service error ::${error.message}`, error);
         }
     }
-    selectEmployee = async (data) => {
+    async selectEmployee(data) {
         try {
-            const employee = await this.employee.findById(data.employee_id);
+            const employee = await this.Employee.findById(data.employee_id);
             if (employee == null) {
                 throw new Error("Employee not exist :: ");
             }
-            let allReviews = await this.review.aggregate([
+            let allReviews = await this.Review.aggregate([
                 {
                     $match: { employee_id: employee._id }
                 },
@@ -107,11 +109,11 @@ class CommonService extends main_service{
                     }
                 }
             ]);
-            const selectedEmployee = { employee: employee, reviws: allReviews };
+            const selectedEmployee = { employee: employee, review: allReviews };
             return selectedEmployee;
         } catch (error) {
-            console.log("Select one employee service error ::",error);
-            throw new Error("Select one employee service error ::"+ error.message, error);
+            console.log("Select one employee service error ::", error);
+            throw new Error(`Select one employee service error ::${error.message}`, error);
         }
     }
 }

@@ -1,12 +1,14 @@
-const employee = require('../model/employee');
-const review = require('../model/review');
-const user = require('../model/user');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const { roles } = require('../constants/roles');
 
 class MainService {
     constructor() {
-        this.review = review;
-        this.user = user;
-        this.employee = employee;
+        this.Review = Review;
+        this.User = User;
+        this.Employee = Employee;
+        this.roles = roles;
     }
 }
 

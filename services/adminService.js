@@ -1,21 +1,21 @@
-const main_service = require('./mainService');
+const MainService = require('./mainService');
 const bcrypt = require('bcrypt');
 
-class AdminService extends main_service{
+class AdminService extends MainService{
     constructor() {
         super();
     }
-    createEmployee = async (data) => {
+    async createEmployee(data){
         try {
-            const employee = await this.employee.findOne({
+            const employee = await this.Employee.findOne({
                 name: data.name,
                 work_group: data.work_group,
                 position: data.position
             });
             if (employee != null) {
-                throw new Error("Employee Alredy Exist");
+                throw new Error("Employee already Exist");
             }
-            const newEmployee = await this.employee.create({
+            const newEmployee = await this.Employee.create({
                 name: data.name,
                 work_group: data.work_group,
                 position: data.position
@@ -23,12 +23,12 @@ class AdminService extends main_service{
             return newEmployee;
         } catch (error) {
             console.log("Create employee service error ::",error);
-            throw new Error("Create employee service error ::"+ error.message, error);
+            throw new Error(`Create employee service error ::${error.message}`, error);
         }
     }
-    updateEmployee = async (data) => {
+    async updateEmployee(data){
         try {
-            const employee = await this.employee.findById(data.employee_id);
+            const employee = await this.Employee.findById(data.employee_id);
             if (employee == null) {
                 throw new Error("Employee not exist :: ")
             }
@@ -36,41 +36,40 @@ class AdminService extends main_service{
             (data.name)? updateEmployee.name = data.name : "";
             (data.work_group)? updateEmployee.work_group = data.work_group : "";
             (data.position)? updateEmployee.position = data.position : "";
-            const updatedEmployee = await this.employee.findByIdAndUpdate(employee._id, updateEmployee);
-            return updatedEmployee;
+            await this.Employee.findByIdAndUpdate(employee._id, updateEmployee);
         } catch (error) {
             console.log("Update employee service error ::",error);
-            throw new Error("Update employee service error ::"+ error.message, error);
+            throw new Error(`Update employee service error ::${error.message}`, error);
         }
     }
-    deleteEmployee = async (data) => {
+    async deleteEmployee(data){
         try {
-            const employee = await this.employee.findById(data.employee_id);
+            const employee = await this.Employee.findById(data.employee_id);
             if (employee == null) {
                 throw new Error("Employee not exist :: ")
             }
-            const userReviews = await this.review.find({ employee_id: employee._id });
+            const userReviews = await this.Review.find({ employee_id: employee._id });
             if(userReviews == null){
-                await this.employee.findByIdAndDelete(employee._id);
+                await this.Employee.findByIdAndDelete(employee._id);
                 return;
             }
-            const notAnonymousReview = userReviews.filter((reviews) => { reviews.user == "anonymous" });
+            const notAnonymousReview = userReviews.filter((reviews) => { reviews.user == this.roles.ANONYMOUS });
             for (let items of notAnonymousReview) {
-                const user = await this.user.findById(items.user);
+                const user = await this.User.findById(items.user);
                 const updateReviewedList = user.reviewed.filter((x) => { x.employee_id == items.employee_id }); 
-                await this.user.findByIdAndUpdate(user._id, { reviewed: updateReviewedList });
+                await this.User.findByIdAndUpdate(user._id, { reviewed: updateReviewedList });
             }
-            await this.review.deleteMany({employee_id:employee._id, user:'anonymous'});
-            await this.review.deleteMany({ employee_id: employee._id });
-            await this.employee.findByIdAndDelete(employee._id);
+            await this.Review.deleteMany({employee_id:employee._id, user:this.roles.ANONYMOUS});
+            await this.Review.deleteMany({ employee_id: employee._id });
+            await this.Employee.findByIdAndDelete(employee._id);
         } catch (error) {
             console.log("Delete employee service error ::",error);
-            throw new Error("Delete employee service error ::"+ error.message, error);
+            throw new Error(`Delete employee service error ::${error.message}`, error);
         }
     }
-    adminCreation = async (data) => {
+    async adminCreation(data){
         try {
-            const admin = await this.user.find({ role: "admin" });
+            const admin = await this.User.find({ role: this.roles.ADMIN });
             if ( admin.length >= 1) {
                 throw new Error("Admin already exist");
             }
@@ -81,10 +80,10 @@ class AdminService extends main_service{
                 password: encPassword,
                 role: data.role
             }
-            await this.user.create(newUser);
+            await this.User.create(newUser);
         } catch (error) {
             console.log("Admin creation service error ::",error);
-            throw new Error("Admin creation service error ::"+ error.message, error);
+            throw new Error(`Admin creation service error ::${error.message}`, error);
         }
     }
 }
