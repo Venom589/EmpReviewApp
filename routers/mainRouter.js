@@ -3,17 +3,17 @@ const login_controller = require('../controllers/loginController');
 const common_controller = require('../controllers/commonController');
 const { isSchemaValid } = require('../middleware/joiValidator');
 const common_validation = require('../middleware/validation/commonValidation');
-const { AdminJwtVerify , UserJwtVerify } = require('../middleware/jwtVerify');
+const { adminJwtVerify , userJwtVerify } = require('../middleware/jwtVerify');
 
-router.use('/admin', AdminJwtVerify,require('./adminRoute'));
-router.use('/user', UserJwtVerify,require('./userRoute'));
+router.use('/admin', adminJwtVerify,require('./adminRoute'));
+router.use('/user', userJwtVerify,require('./userRoute'));
 
-router.post('/signup', isSchemaValid(common_validation.signup),login_controller.Signup);
-router.post('/login', isSchemaValid(common_validation.login),login_controller.Login);
+router.post('/signup', isSchemaValid(common_validation.signup),login_controller.signup);
+router.post('/login', isSchemaValid(common_validation.login),login_controller.login);
 //router.post('/logout', isSchemaValid(commonValidation.signup), login_controller.Logout);
-router.get('/allEmploye', common_controller.AllEmployee);
-router.post('/oneEmploye', isSchemaValid(common_validation.select_employe),common_controller.SelectEmploye);
-router.post('/addReview', isSchemaValid(common_validation.add_review),common_controller.AddReview);
+router.get('/allEmployee', common_controller.allEmployee);
+router.post('/oneEmployee', isSchemaValid(common_validation.selectEmployee),common_controller.selectEmployee);
+router.post('/addReview', isSchemaValid(common_validation.addReview),common_controller.addReview);
 
 
 module.exports = router;

@@ -6,7 +6,7 @@ module.exports.isSchemaValid = (schema) =>{
                 next()
             }else{
                 console.log(is_valid.error);
-                let errMessage = is_valid.error.details.map(detail=>detail.message);
+                const errMessage = is_valid.error.details.map(detail=>detail.message);
                 return res.status(400).json({
                     message: errMessage
                 });

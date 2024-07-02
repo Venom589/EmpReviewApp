@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 
 class AdminValidation {
 
-    work_group = ["Group_A", "Group_B", "Group_C", "Group_D"];
+    workGroup = ["Group_A", "Group_B", "Group_C", "Group_D"];
 
     position = ["Intern", "Junior", "Senior", "Head"];
 
-    IsValidId = (value, helpers) => {
+    isValidId = (value, helpers) => {
         try {
             if (!mongoose.Types.ObjectId.isValid(value)) {
                 throw new Error;
@@ -17,7 +17,7 @@ class AdminValidation {
             return helpers.error('any.invalid');
         }
     }
-    create_employe = joi.object({
+    createEmployee = joi.object({
         name: joi.string()
             .required()
             .max(20)
@@ -26,7 +26,7 @@ class AdminValidation {
         work_group: joi.string()
             .required()
             .pattern(/^\S+$/)
-            .valid(...this.work_group)
+            .valid(...this.workGroup)
             .messages({
                 "string.pattern.base": "Please enter work group from following Group_A, Group_B, Group_C, Group_D or remove whitespace"
             }),
@@ -40,23 +40,23 @@ class AdminValidation {
             })
     });
 
-    select_delete_employe = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validate')
+    selectDeleteEmployee = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validate')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
             }),
     });
 
-    edit_emoloye = joi.object({
+    editEmoloyee = joi.object({
         name: joi.string()
             .max(20)
             .min(4),
 
         work_group: joi.string()
             .pattern(/^\S+$/)
-            .valid(...this.work_group)
+            .valid(...this.workGroup)
             .messages({
                 "string.pattern.base": "Please enter work group from following Group_A, Group_B, Group_C, Group_D or remove whitespace"
             }),
@@ -68,17 +68,17 @@ class AdminValidation {
                 "string.pattern.base": "Please enter position which is Intern, Junior, Senior, Head or remove whitespace"
             }),
 
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validation')
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
             })
     });
 
-    add_review = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validation')
+    addReview = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
@@ -94,9 +94,9 @@ class AdminValidation {
             .required()
     });
 
-    edit_review = joi.object({
+    editReview = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
@@ -111,18 +111,18 @@ class AdminValidation {
             .max(200)
     });
 
-    delete_review = joi.object({
+    deleteReview = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
             })
     });
 
-    reply_review = joi.object({
+    replyReview = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
@@ -138,9 +138,9 @@ class AdminValidation {
             .required()
     });
 
-    edit_reply = joi.object({
+    editReply = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
@@ -151,9 +151,9 @@ class AdminValidation {
             .max(200)
     });
 
-    delete_user = joi.object({
+    deleteUser = joi.object({
         user_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'

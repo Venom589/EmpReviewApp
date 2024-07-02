@@ -7,14 +7,14 @@ class CommonService extends main_service{
         super();
     }
     
-    Login = async(data) =>{
+    login = async(data) =>{
         try {
             let token = null;
-            let user = await this.user.findOne({email:data.email});
+            const user = await this.user.findOne({email:data.email});
             if(user == null){
                 throw new Error("User not found");
             }
-            let passCheck = bcrypt.compare(data.password,user.password);  
+            const passCheck = bcrypt.compare(data.password,user.password);  
             if(passCheck == false){
                 throw new Error("Incorrect Password");
             }
@@ -27,7 +27,7 @@ class CommonService extends main_service{
             if(token == null){
                 throw new Error("Token not created :: ");
             }
-            let userData = {
+            const userData = {
                 "name":user.name,
                 "email":user.email,
                 "role":user.role,
@@ -35,57 +35,59 @@ class CommonService extends main_service{
             }
             return userData;
         } catch (error) {
+            console.log("login service error ::",error);
             throw new Error("login service error ::"+ error.message,error);
         }
     }
-    CheckUser = async(data) =>{
+    checkUser = async(data) =>{
         try {
-            let userData = await this.user.findOne({email:data.email});
-            if(userData == null){
+            const user = await this.user.findOne({email:data.email});
+            if(user == null){
                 throw new Error("User not found :: ");
             }
-            return userData;
+            return user;
         } catch (error) {
-            throw new Error("login service error ::"+ error.message,error);
+            throw new Error("Check user service error ::"+ error.message,error);
         }
     }
-    AllEmploye = async() =>{
+    allEmployee = async() =>{
         try {
-            let employees = await this.employe.find();
-            let allEmployes = [];
+            const employees = await this.employee.find();
+            let allEmployees = [];
             for (let item of employees) {
-                allEmployes.push({
+                allEmployees.push({
                     employee: item,
                     reviews: await this.review.aggregate([
                         {
-                            $match: { employe_id: item._id }
+                            $match: { employee_id: item._id }
                         },
                         {
-                            $count: "users"
+                            $count: "count"
                         }
                     ])
                 });
             }
-            return allEmployes;
+            return allEmployees;
         } catch (error) {
-            throw new Error("All employe service error ::"+ error.message,error);
+            console.log("All employee service error ::",error);
+            throw new Error("All employee service error ::"+ error.message,error);
         }
     }
-    SelectEmploye = async (data) => {
+    selectEmployee = async (data) => {
         try {
-            let oneEmploye = await this.employe.findById(data.employe_id);
-            if (oneEmploye == null) {
-                throw new Error("Employe not exist :: ");
+            const employee = await this.employee.findById(data.employee_id);
+            if (employee == null) {
+                throw new Error("Employee not exist :: ");
             }
             let allReviews = await this.review.aggregate([
                 {
-                    $match: { employe_id: oneEmploye._id }
+                    $match: { employee_id: employee._id }
                 },
                 {
                     $project: {
                         "_id": 1,
                         "user": 1,
-                        "employe_id": 1,
+                        "employee_id": 1,
                         "review": 1,
                         "reply": 1,
                         "created_at": {
@@ -105,10 +107,11 @@ class CommonService extends main_service{
                     }
                 }
             ]);
-            let selectedEmploye = { employe: oneEmploye, reviws: allReviews };
-            return selectedEmploye;
+            const selectedEmployee = { employee: employee, reviws: allReviews };
+            return selectedEmployee;
         } catch (error) {
-            throw new Error("Select one Employee service error ::"+ error.message, error);
+            console.log("Select one employee service error ::",error);
+            throw new Error("Select one employee service error ::"+ error.message, error);
         }
     }
 }

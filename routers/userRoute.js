@@ -3,10 +3,10 @@ const user_controller = require('../controllers/userController');
 const { isSchemaValid } = require('../middleware/joiValidator');
 const user_validation = require('../middleware/validation/userValidation');
 
-router.get('/allEmploye',user_controller.AllEmployee);
-router.post('/oneEmploye', isSchemaValid( user_validation.select_employe),user_controller.SelectEmploye);
-router.post('/addReview', isSchemaValid( user_validation.add_review),user_controller.AddReview);
-router.post('/editName', isSchemaValid( user_validation.edit_name),user_controller.EditName);
-router.post('/editReview', isSchemaValid( user_validation.edit_review),user_controller.EditReview);
+router.get('/allEmployee',user_controller.allEmployee);
+router.post('/oneEmployee', isSchemaValid( user_validation.selectEmployee),user_controller.selectEmployee);
+router.post('/addReview', isSchemaValid( user_validation.addReview),user_controller.addReview);
+router.post('/editName', isSchemaValid( user_validation.editName),user_controller.editName);
+router.post('/editReview', isSchemaValid( user_validation.editReview),user_controller.editReview);
 
 module.exports = router;

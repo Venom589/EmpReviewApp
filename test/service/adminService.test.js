@@ -1,10 +1,10 @@
 const admin_service = require('../../services/adminService');
 const bcrypt = require('bcrypt');
-const employe = require('../../model/employe');
+const employee = require('../../model/employee');
 const user = require('../../model/user');
 const review = require('../../model/review');
 
-jest.mock('../../model/employe');
+jest.mock('../../model/employee');
 jest.mock('../../model/user');
 jest.mock('../../model/review');
 
@@ -14,90 +14,90 @@ describe('Admin service', () => {
     });
 
     it("employee creation test", async () => {
-        let employeMock = {
+        const employeeMock = {
             _id: "1",
             name: "x",
             work_group: "x",
             position: "x",
             __v: "0"
         }
-        let data = { name: "x", work_group: "x", position: "x" };
+        const data = { name: "x", work_group: "x", position: "x" };
         //create test//
 
-        employe.create.mockResolvedValue(employeMock);
-        employe.findOne.mockResolvedValue();
-        const result = await admin_service.CreateEmploye(data);
-        expect(employe.findOne).toHaveBeenCalled();
-        expect(employe.create).toHaveBeenCalled();
-        expect(employe.create).toHaveBeenCalledWith(data);
-        expect(result).toEqual(employeMock);
+        employee.create.mockResolvedValue(employeeMock);
+        employee.findOne.mockResolvedValue();
+        const result = await admin_service.createEmployee(data);
+        expect(employee.findOne).toHaveBeenCalled();
+        expect(employee.create).toHaveBeenCalled();
+        expect(employee.create).toHaveBeenCalledWith(data);
+        expect(result).toEqual(employeeMock);
 
         //create error test//
-        employe.create.mockRejectedValue(new Error("Create Query Error:"));
+        employee.create.mockRejectedValue(new Error("Create Query Error:"));
         await expect(
-            admin_service.CreateEmploye(data)
-        ).rejects.toThrow("Create employe service error ::Create Query Error:");
+            admin_service.createEmployee(data)
+        ).rejects.toThrow("Create employee service error ::Create Query Error:");
 
         //findone error test//
-        employe.findOne.mockResolvedValue(employeMock);
+        employee.findOne.mockResolvedValue(employeeMock);
         await expect(
-            admin_service.CreateEmploye(data)
-        ).rejects.toThrow("Create employe service error ::Employee Alredy Exist");
+            admin_service.createEmployee(data)
+        ).rejects.toThrow("Create employee service error ::Employee Alredy Exist");
 
-        employe.findOne.mockRejectedValue(new Error("Find One Error:"));
+        employee.findOne.mockRejectedValue(new Error("Find One Error:"));
         await expect(
-            admin_service.CreateEmploye(data)
-        ).rejects.toThrow("Create employe service error ::Find One Error:");
+            admin_service.createEmployee(data)
+        ).rejects.toThrow("Create employee service error ::Find One Error:");
     });
 
     it("employee Update test", async () => {
-        let findEmployeMock = {
+        const findEmployeeMock = {
             _id: "1",
             name: "x",
             work_group: "x",
             position: "x",
             __v: "0"
         }
-        let data = {
-            employe_id: "1",
+        const data = {
+            employee_id: "1",
             name: "testNew",
             work_group: "testNew",
             position: ""
         }
         //update test//
-        employe.findById.mockResolvedValue(findEmployeMock);
-        employe.findByIdAndUpdate.mockResolvedValue(findEmployeMock);
-        const result = await admin_service.UpdateEmploye(data);
-        expect(employe.findById).toHaveBeenCalled();
-        expect(employe.findByIdAndUpdate).toHaveBeenCalled();
-        expect(employe.findById).toHaveBeenCalledWith(data.employe_id);
-        expect(employe.findByIdAndUpdate).toHaveBeenCalledWith(data.employe_id, findEmployeMock);
-        expect(result).toMatchObject(findEmployeMock);
+        employee.findById.mockResolvedValue(findEmployeeMock);
+        employee.findByIdAndUpdate.mockResolvedValue(findEmployeeMock);
+        const result = await admin_service.updateEmployee(data);
+        expect(employee.findById).toHaveBeenCalledTimes(1);
+        expect(employee.findByIdAndUpdate).toHaveBeenCalled();
+        expect(employee.findById).toHaveBeenLastCalledWith(data.employee_id);
+        expect(employee.findByIdAndUpdate).toHaveBeenCalledWith(data.employee_id, findEmployeeMock);
+        expect(result).toMatchObject(findEmployeeMock);
 
         //error update test//
-        employe.findById.mockRejectedValue(new Error("employe find error"));
-        expect(admin_service.UpdateEmploye(data)).rejects.toThrow("Update employe service error ::employe find error");
-        employe.findById.mockResolvedValue(findEmployeMock);
-        employe.findByIdAndUpdate.mockRejectedValue(new Error("updation Error"));
-        expect(admin_service.UpdateEmploye(data)).rejects.toThrow("Update employe service error ::updation Error");
-        employe.findById.mockResolvedValue(null);
-        expect(admin_service.UpdateEmploye(data)).rejects.toThrow("Update employe service error ::Employe not exist ::");
+        employee.findById.mockRejectedValueOnce(new Error("employee find error"));
+        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::employee find error");
+        employee.findById.mockResolvedValue(findEmployeeMock);
+        employee.findByIdAndUpdate.mockRejectedValue(new Error("updation Error"));
+        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::updation Error");
+        employee.findById.mockResolvedValue(null);
+        expect(admin_service.updateEmployee(data)).rejects.toThrow("Update employee service error ::Employee not exist ::");
     });
 
     it("employee deletion test", async () => {
-        let employee = {
+        const mockEmployee = {
             _id: "1",
             name: "x",
             work_group: "x",
             position: "x",
             __v: "0"
         }
-        let reviews = [
+        const mockReviews = [
             {
                 _id: "1",
                 __v: "0",
                 user: "anonymous",
-                employe_id: "1",
+                employee_id: "1",
                 review: "review1",
                 reply: "reply1"
             },
@@ -105,7 +105,7 @@ describe('Admin service', () => {
                 _id: "2",
                 __v: "0",
                 user: "1",
-                employe_id: "1",
+                employee_id: "1",
                 review: "review2",
                 reply: "reply3"
             },
@@ -113,62 +113,38 @@ describe('Admin service', () => {
                 _id: "3",
                 __v: "0",
                 user: "2",
-                employe_id: "1",
+                employee_id: "1",
                 review: "review3",
                 reply: "reply3"
             },
         ];
-        let users = [
-            {
-                _id: '1',
-                __v: "0",
-                name: "D",
-                email: "D@123.com",
-                password: "Dtest@123",
-                reviewed: [
-                    { Employe: "1" }
-                ],
-                role: "admin"
-            },
-            {
-                _id: '2',
-                __v: "0",
-                name: "f",
-                email: "f@123.com",
-                password: "ftest@123",
-                reviewed: [
-                    { Employe: "1" }
-                ],
-                role: "user"
-            },
-        ]
-        employe.findById.mockResolvedValue(employee);
-        review.find.mockResolvedValue(reviews);
-        review.deleteMany.mockResolvedValue(employee)
-        let filterSpy = jest.spyOn(Array.prototype, "filter");
+        employee.findById.mockResolvedValue(mockEmployee);
+        review.find.mockResolvedValue(mockReviews);
+        review.deleteMany.mockResolvedValue(mockEmployee)
+        const filterSpy = jest.spyOn(Array.prototype, "filter");
 
 
         //delete employe
-        let data = { employe_id: "1" };
-        let result = await admin_service.DeleteEmploye(data);
-        expect(employe.findById).toHaveBeenCalled();
-        expect(employe.findById).toHaveBeenCalledWith(data.employe_id);
+        const data = { employee_id: "1" };
+        const result = await admin_service.deleteEmployee(data);
+        expect(employee.findById).toHaveBeenCalled();
+        expect(employee.findById).toHaveBeenCalledWith(data.employee_id);
         expect(filterSpy).toHaveBeenCalledTimes(3);
         // expect(user.findByIdAndUpdate).toHaveBeenCalled();
         expect(review.deleteMany).toHaveBeenCalledTimes(2);
-        expect(employe.findByIdAndDelete).toHaveBeenCalledTimes(1);
+        expect(employee.findByIdAndDelete).toHaveBeenCalledTimes(1);
 
         //delete employe error
-        employe.findById.mockResolvedValue(null);
-        expect(admin_service.DeleteEmploye(data)).rejects.toThrow("Delete Employee service error ::Employe not exist :: ");
-        employe.findById.mockResolvedValue(employee);
+        employee.findById.mockResolvedValue(null);
+        expect(admin_service.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Employee not exist :: ");
+        employee.findById.mockResolvedValue(employee);
         review.find.mockRejectedValue(new Error("Review not find"));
-        expect(admin_service.DeleteEmploye(data)).rejects.toThrow("Delete Employee service error ::Review not find");
+        expect(admin_service.deleteEmployee(data)).rejects.toThrow("Delete employee service error ::Review not find");
 
     });
 
     it("admin creation test", async () => {
-        let users = [
+        const mockUsers = [
             {   
                 _id:"1",
                 name: "test1",
@@ -201,14 +177,14 @@ describe('Admin service', () => {
             role: "admin",
         };
         user.find.mockResolvedValue([]);
-        let bcryptSpy = jest.spyOn(bcrypt , 'hash');
-        await admin_service.AdminCreation(data);
+        const bcryptSpy = jest.spyOn(bcrypt , 'hash');
+        await admin_service.adminCreation(data);
         //adminCreat
         expect(user.find).toHaveBeenCalledTimes(1);
         expect(user.find).toHaveBeenCalledWith({role:"admin"});
         expect(user.create).toHaveBeenCalledTimes(1);
         //admin create error
-        user.find.mockResolvedValue([users[2]]);
-        expect(admin_service.AdminCreation(data)).rejects.toThrow("Admin Creation service error ::Admin already exist");
+        user.find.mockResolvedValue([mockUsers[2]]);
+        expect(admin_service.adminCreation(data)).rejects.toThrow("Admin creation service error ::Admin already exist");
     });
 });

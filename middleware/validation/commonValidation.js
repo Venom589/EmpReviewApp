@@ -5,7 +5,7 @@ class CommonValidation {
 
     role = ["admin", "user"]
 
-    IsValidId = (value, helpers) => {
+    isValidId = (value, helpers) => {
         try {
             if (!mongoose.Types.ObjectId.isValid(value)) {
                 throw new Error;
@@ -16,18 +16,18 @@ class CommonValidation {
         }
     }
 
-    select_employe = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validation')
+    selectEmployee = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
             })
     });
 
-    add_review = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id vaidation')
+    addReview = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id vaidation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'

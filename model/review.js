@@ -7,10 +7,10 @@ const review_schema = new mongoose.Schema({
         max: [20, "Please enter name of 4-20 letters."],
         min: [4, "Please enter name of 4-20 letters."]
     },
-    employe_id: {
+    employee_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'users',
-        require: [true, "Please select an employe."],
+        require: [true, "Please select an employee."],
     },
     review: {
         type: String,

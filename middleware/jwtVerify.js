@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-module.exports.AdminJwtVerify = async (req, res, next) => {
+module.exports.adminJwtVerify = async (req, res, next) => {
     try {
         if(req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer"){
             jwt.verify(req.headers.authorization.split(" ")[1],
@@ -17,7 +17,7 @@ module.exports.AdminJwtVerify = async (req, res, next) => {
     }
 }
 
-module.exports.UserJwtVerify = async (req, res, next) => {
+module.exports.userJwtVerify = async (req, res, next) => {
     try {
         if(req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer"){
             jwt.verify(req.headers.authorization.split(" ")[1],

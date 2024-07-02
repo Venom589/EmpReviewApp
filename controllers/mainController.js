@@ -1,4 +1,4 @@
-const employe = require('../model/employe');
+const employee = require('../model/employee');
 const review = require('../model/review');
 const user = require('../model/user');
 const admin_service = require('../services/adminService');
@@ -10,7 +10,7 @@ class MainController{
     constructor(){
         this.review = review;
         this.user = user;
-        this.employe = employe;
+        this.employee = employee;
         this.adminService = admin_service;
         this.reviewService = review_service;
         this.userService = user_service;
