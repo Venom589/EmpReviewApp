@@ -1,20 +1,21 @@
-const MainService = require('./mainService');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const { roles } = require('../constants/roles');
 
-class ReviewService extends MainService {
-    constructor() {
-        super();
-    }
-    async addReview(data){
+class ReviewService {
+
+    async addReview(data) {
         try {
-            const user = await this.User.findOne({ email: data.email });
+            const user = await User.findOne({ email: data.email });
             if (user == null) {
                 throw new Error("User not found :: ");
             }
-            const employee = await this.Employee.findOne({ _id: data.employee_id });
+            const employee = await Employee.findOne({ _id: data.employee_id });
             if (employee == null) {
                 throw new Error("Employee not found :: ");
             }
-            const reviews = await this.Review.find({ employee_id: data.employee_id, user: (String)(user._id) });
+            const reviews = await Review.find({ employee_id: data.employee_id, user: (String)(user._id) });
             if (reviews.length == 3) {
                 throw new Error("you have already review 3 time you cannot review now.");
             }
@@ -28,49 +29,49 @@ class ReviewService extends MainService {
                 updateUserReviewed.push({
                     employee_id: employee._id
                 });
-                await this.User.findByIdAndUpdate(user._id, { reviewed: updateUserReviewed });
+                await User.findByIdAndUpdate(user._id, { reviewed: updateUserReviewed });
             }
-            const newReview = await this.Review.create(reviewData);
+            const newReview = await Review.create(reviewData);
             return newReview;
         } catch (error) {
-            console.log("Add review service error ::",error);
+            console.log("Add review service error ::", error);
             throw new Error(`Add review service error ::${error.message}`, error);
         }
     }
-    async editReview(data){
+    async editReview(data) {
         try {
-            const user = await this.User.findOne({ email: data.email });
+            const user = await User.findOne({ email: data.email });
             if (user == null) {
                 throw new Error("User not found :: ");
             }
-            const review = await this.Review.findOne({ _id: data.review_id, user: (String)(user._id) });
+            const review = await Review.findOne({ _id: data.review_id, user: (String)(user._id) });
             if (review == null) {
                 throw new Error("Review not found :: ");
             }
             if (data.review) {
-                await this.Review.findByIdAndUpdate(review._id, { review: data.review });
+                await Review.findByIdAndUpdate(review._id, { review: data.review });
             }
         } catch (error) {
-            console.log("Edit review service error ::",error);
+            console.log("Edit review service error ::", error);
             throw new Error(`Edit review service error ::${error.message}`, error);
         }
     }
-    async deleteReview(data){
+    async deleteReview(data) {
         try {
-            const deleteReview = await this.Review.findOne({ _id: data.review_id });
+            const deleteReview = await Review.findOne({ _id: data.review_id });
             if (deleteReview == null) {
                 throw new Error("Review not found :: ");
             }
-            if (deleteReview.user == this.roles.ANONYMOUS) {
-                await this.Review.findByIdAndDelete(deleteReview._id);
+            if (deleteReview.user == roles.ANONYMOUS) {
+                await Review.findByIdAndDelete(deleteReview._id);
                 return;
             } else {
-                await this.Review.findByIdAndDelete(deleteReview._id);
-                const review = await this.Review.find({ employee_id: deleteReview.employee_id, user: (String)(deleteReview.user) });
-                if (review.length == 0 ) {
-                    const user = await this.User.findById(deleteReview.user);
-                    const removeReview =user.reviewed.filter((x) => x.employee_id == deleteReview.employee_id); 
-                    await this.User.findByIdAndUpdate(deleteReview.user, { reviewed: removeReview });
+                await Review.findByIdAndDelete(deleteReview._id);
+                const review = await Review.find({ employee_id: deleteReview.employee_id, user: (String)(deleteReview.user) });
+                if (review.length == 0) {
+                    const user = await User.findById(deleteReview.user);
+                    const removeReview = user.reviewed.filter((x) => x.employee_id == deleteReview.employee_id);
+                    await User.findByIdAndUpdate(deleteReview.user, { reviewed: removeReview });
                 }
             }
         } catch (error) {
@@ -78,23 +79,23 @@ class ReviewService extends MainService {
             throw new Error(`Delete review service error ::${error.message}`, error);
         }
     }
-    async replyReview(data){
+    async replyReview(data) {
         try {
-            const user = await this.User.findOne({ email: data.email });
+            const user = await User.findOne({ email: data.email });
             if (user == null) {
                 throw new Error("User not found");
             }
-            if (user.role != this.roles.ADMIN) {
+            if (user.role != roles.ADMIN) {
                 throw new Error("Admin not found");
             }
-            const review = await this.Review.findById(data.review_id);
+            const review = await Review.findById(data.review_id);
             if (review == null) {
                 throw new Error("Review not found :: ");
             }
             if (review.reply != null) {
                 throw new Error("You already replied this review");
             }
-            await this.Review.findOneAndUpdate(
+            await Review.findOneAndUpdate(
                 { _id: review._id }, { reply: data.reply }),
                 { timestamps: false };
         } catch (error) {
@@ -102,9 +103,9 @@ class ReviewService extends MainService {
             throw new Error(`Reply review service error ::${error.message}`, error);
         }
     }
-    async editReply(data){
+    async editReply(data) {
         try {
-            const review = await this.Review.findOne({ _id: data.review_id });
+            const review = await Review.findOne({ _id: data.review_id });
             if (review == null) {
                 throw new Error("Review not found :: ");
             }
@@ -112,27 +113,27 @@ class ReviewService extends MainService {
                 throw new Error("You have not replied this review");
             }
             if (data.reply) {
-                await this.Review.findOneAndUpdate({ _id: review._id }, { reply: data.reply }),
-                { timestamps: false };
+                await Review.findOneAndUpdate({ _id: review._id }, { reply: data.reply }),
+                    { timestamps: false };
             }
-            
+
         } catch (error) {
             console.log("Edit reply service error ::", error);
             throw new Error(`Edit reply service error ::${error.message}`, error);
         }
     }
-    async addAnonymousReview(data){
+    async addAnonymousReview(data) {
         try {
-            const employee = await this.Employee.findById(data.employee_id);
+            const employee = await Employee.findById(data.employee_id);
             if (employee == null) {
                 throw new Error("Employee not found :: ");
             }
             const reviewData = {
-                user: this.roles.ANONYMOUS,
+                user: roles.ANONYMOUS,
                 employee_id: employee._id,
                 review: data.review,
             }
-            await this.Review.create(reviewData);
+            await Review.create(reviewData);
         } catch (error) {
             console.log("Add anonymous review service error ::", error);
             throw new Error(`Add anonymous review service error ::${error.message}`, error);

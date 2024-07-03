@@ -1,17 +1,16 @@
-const MainService = require('./mainService');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const { roles } = require('../constants/roles');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const review = require('../model/review');
 
-class CommonService extends MainService {
-    constructor() {
-        super();
-    }
+class CommonService {
 
     async login(data) {
         try {
             let token = null;
-            const user = await this.User.findOne({ email: data.email });
+            const user = await User.findOne({ email: data.email });
             if (user == null) {
                 throw new Error("User not found");
             }
@@ -19,10 +18,10 @@ class CommonService extends MainService {
             if (passCheck == false) {
                 throw new Error("Incorrect Password");
             }
-            if (user.role == this.roles.ADMIN) {
+            if (user.role == roles.ADMIN) {
                 token = jwt.sign({ user: user.name }, process.env.ADMIN_JWT_SECRET, { expiresIn: "1h" });
             }
-            if (user.role == this.roles.USER) {
+            if (user.role == roles.USER) {
                 token = jwt.sign({ user: user.name }, process.env.USER_JWT_SECRET, { expiresIn: "1h" });
             }
             if (token == null) {
@@ -42,7 +41,7 @@ class CommonService extends MainService {
     }
     async checkUser(data) {
         try {
-            const user = await this.User.findOne({ email: data.email });
+            const user = await User.findOne({ email: data.email });
             if (user == null) {
                 throw new Error("User not found :: ");
             }
@@ -54,12 +53,12 @@ class CommonService extends MainService {
     }
     async allEmployee() {
         try {
-            const employees = await this.Employee.find();
+            const employees = await Employee.find();
             const allEmployees = [];
             for (let item of employees) {
                 allEmployees.push({
                     employee: item,
-                    reviews: await this.Review.aggregate([
+                    reviews: await Review.aggregate([
                         {
                             $match: { employee_id: item._id }
                         },
@@ -77,11 +76,11 @@ class CommonService extends MainService {
     }
     async selectEmployee(data) {
         try {
-            const employee = await this.Employee.findById(data.employee_id);
+            const employee = await Employee.findById(data.employee_id);
             if (employee == null) {
                 throw new Error("Employee not exist :: ");
             }
-            let allReviews = await this.Review.aggregate([
+            let allReviews = await Review.aggregate([
                 {
                     $match: { employee_id: employee._id }
                 },
