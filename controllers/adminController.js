@@ -33,7 +33,7 @@ class AdminController {
                 throw new Error("Request body not found");
             }
             const data = await AdminService.createEmployee(req.body);
-            res.status(200).json(data);
+            res.status(201).json(data);
         } catch (error) {
             console.log("Create employee error :: ", error);
             res.sendStatus(400);
@@ -69,7 +69,7 @@ class AdminController {
                 throw new Error("Employee Id not found ::");
             }
             const data = await ReviewService.addReview(req.body);
-            res.status(200).json(data);
+            res.status(201).json(data);
         } catch (error) {
             console.log("AddReview error :: ", error);
             res.sendStatus(400);

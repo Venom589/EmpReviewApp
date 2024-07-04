@@ -30,7 +30,7 @@ class CommonController {
                 throw new Error("Employee Id not found ::");
             }
             await ReviewService.addAnonymousReview(req.body);
-            res.sendStatus(200);
+            res.sendStatus(201);
         } catch (error) {
             console.log("AddReview error :: ", error);
             res.sendStatus(400);

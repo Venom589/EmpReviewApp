@@ -35,10 +35,12 @@ class AdminService {
                 throw new Error("Employee not exist :: ")
             }
             let updateEmployee = employee;
-            (data.name) ? updateEmployee.name = data.name : "";
-            (data.work_group) ? updateEmployee.work_group = data.work_group : "";
-            (data.position) ? updateEmployee.position = data.position : "";
-            await Employee.findByIdAndUpdate(employee._id, updateEmployee);
+            if (data.name || data.work_group || data.position) {
+                (data.name) ? updateEmployee.name = data.name : "";
+                (data.work_group) ? updateEmployee.work_group = data.work_group : "";
+                (data.position) ? updateEmployee.position = data.position : "";
+                await Employee.findByIdAndUpdate(employee._id, updateEmployee);
+            }
         } catch (error) {
             console.log("Update employee service error ::", error);
             throw new Error(`Update employee service error ::${error.message}`, error);

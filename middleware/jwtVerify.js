@@ -13,7 +13,7 @@ module.exports.adminJwtVerify = async (req, res, next) => {
         }
     } catch (error) {
         console.log("jwt Error :: ",error);
-        res.sendStatus(401);
+        res.sendStatus(403);
     }
 }
 
@@ -30,6 +30,6 @@ module.exports.userJwtVerify = async (req, res, next) => {
         }
     } catch (error) {
         console.log("jwt Error :: ",error);
-        res.sendStatus(401);
+        res.sendStatus(403);
     }
 }

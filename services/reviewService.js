@@ -116,7 +116,6 @@ class ReviewService {
                 await Review.findOneAndUpdate({ _id: review._id }, { reply: data.reply }),
                     { timestamps: false };
             }
-
         } catch (error) {
             console.log("Edit reply service error ::", error);
             throw new Error(`Edit reply service error ::${error.message}`, error);

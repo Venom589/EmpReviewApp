@@ -10,7 +10,7 @@ class CommonValidation {
             if (!mongoose.Types.ObjectId.isValid(value)) {
                 throw new Error;
             }
-            return value;    
+            return value;
         } catch (error) {
             return helpers.error('any.invalid');
         }
@@ -21,7 +21,7 @@ class CommonValidation {
             .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
-                'any.invalid':'Enter an valid mongoose object id'
+                'any.invalid': 'Enter an valid mongoose object id'
             })
     });
 
@@ -30,7 +30,7 @@ class CommonValidation {
             .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
-                'any.invalid':'Enter an valid mongoose object id'
+                'any.invalid': 'Enter an valid mongoose object id'
             }),
 
         review: joi.string()
@@ -80,14 +80,7 @@ class CommonValidation {
             .messages({
                 "string.pattern.base": "Please enter a password that includes at least one uppercase letter, one lowercase letter and one special character without whitespace"
             }),
-
-        role: joi.string()
-            .valid(...this.role)
-            .required()
-            .messages({
-                "string.pattern.base": "Please enter role admin or user"
-            }),
-    })
+    });
 }
 
 module.exports = new CommonValidation();

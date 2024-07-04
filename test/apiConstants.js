@@ -29,18 +29,15 @@ module.exports.admin = {
     login: {
         email: "usertest@1111.com",
         password: "Usertest@111",
-        role: "admin"
     },
     login_error: {
         password: {
             email: "usertest@1111.com",
             password: "Urtest@111",
-            role: "admin"
         },
         email: {
             email: "userdjkj@1111.com",
             password: "Usertest@111",
-            role: "admin"
         }
     },
     login_data: {}
@@ -75,19 +72,16 @@ module.exports.user = {
     },
     login: {
         email: "usertest@222.com",
-        password: "Usertest@111",
-        role: "admin"
+        password: "Usertest@111"
     },
     login_error: {
         password: {
             email: "usertest@222.com",
-            password: "Urtest@111",
-            role: "admin"
+            password: "Urtest@111"
         },
         email: {
             email: "userdjkj@1111.com",
-            password: "Usertest@111",
-            role: "admin"
+            password: "Usertest@111"
         }
     },
     login_data: {}
@@ -117,7 +111,7 @@ module.exports.review = {
         }
     },
     edit_review: {
-        review_id:"",
+        review_id: "",
         email: "usertest@1111.com",
         review: "testReview1"
     },
@@ -137,7 +131,7 @@ module.exports.review = {
     edit_review_id: "",
     delete_review_id: "",
     edit_reply_review_id: "",
-    user_review_id:""
+    user_review_id: ""
 }
 
 module.exports.employee = {
@@ -157,43 +151,43 @@ module.exports.employee = {
             "work_group": "Group_g",
             "position": "Junior"
         },
-        position:{
-            "name":"test4",
-        "work_group":"Group_D",
-        "position":"nothing"
+        position: {
+            "name": "test4",
+            "work_group": "Group_D",
+            "position": "nothing"
         },
     },
-    edit_employee:{
-        "employee_id":"6683789cca7661d812cc38b5",
-        "name":"testupdate1",
-        "work_group":"Group_C",
-        "position":"Junior"
+    edit_employee: {
+        "employee_id": "6683789cca7661d812cc38b5",
+        "name": "testupdate1",
+        "work_group": "Group_C",
+        "position": "Junior"
     },
-    edit_employee_error:{
-        employee_id:{
-            "employee_id":"",
-            "name":"testupdate1",
-            "work_group":"Group_C",
-            "position":"Junior"
+    edit_employee_error: {
+        employee_id: {
+            "employee_id": "",
+            "name": "testupdate1",
+            "work_group": "Group_C",
+            "position": "Junior"
         },
-        work_group:{
-            "employee_id":"6683789cca7661d812cc38b5",
-            "name":"testupdate1",
-            "work_group":"Group_h",
-            "position":"Junior"
+        work_group: {
+            "employee_id": "6683789cca7661d812cc38b5",
+            "name": "testupdate1",
+            "work_group": "Group_h",
+            "position": "Junior"
         },
-        position:{
-            "employee_id":"6683789cca7661d812cc38b5",
-            "name":"testupdate1",
-            "work_group":"Group_C",
-            "position":"nothing"
+        position: {
+            "employee_id": "6683789cca7661d812cc38b5",
+            "name": "testupdate1",
+            "work_group": "Group_C",
+            "position": "nothing"
         }
     },
-    employee_id:"",
-    employee:{}
+    employee_id: "",
+    employee: {}
 }
 
 module.exports.token = {
-    admin:"",
-    user:""
+    admin: "",
+    user: ""
 }

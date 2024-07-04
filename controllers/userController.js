@@ -43,7 +43,7 @@ class UserController {
                 throw new Error("Employee Id not found ::");
             }
             const review = await UserService.addReview(req.body);
-            res.status(200).json(review);
+            res.status(201).json(review);
         } catch (error) {
             console.log("AddReview error :: ", error);
             res.sendStatus(400);

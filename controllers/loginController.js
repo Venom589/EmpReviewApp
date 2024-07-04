@@ -21,7 +21,7 @@ class LoginController {
             if (req.body.role == roles.USER) {
                 await UserService.userCreation(req.body);
             }
-            res.sendStatus(200);
+            res.sendStatus(201);
         } catch (error) {
             console.log("Sign up error :: ", error);
             res.sendStatus(400);
@@ -29,7 +29,7 @@ class LoginController {
     }
     async login(req, res) {
         try {
-            if (!req.body.email || !req.body.password || !req.body.role) {
+            if (!req.body.email || !req.body.password ) {
                 throw new Error("Request data not received :: ");
             }
             const data = await CommonService.login(req.body);
