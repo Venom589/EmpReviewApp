@@ -297,6 +297,12 @@ describe("POST /admin/addEmployee", () => {
             });
         });
     });
+    it('Cannot add same employee for same position and workgroup', async () => {
+        const addEmployeeError = await request(app).post('/admin/addEmployee')
+            .auth(token.admin, { type: "bearer" })
+            .send(employee.create_employee);
+        expect(addEmployeeError.status).toBe(400);
+    });
 });
 
 describe("GET /admin/allEmployee", () => {
@@ -400,11 +406,11 @@ describe("POST /admin/oneEmployee", () => {
         });
         it("extra field Error", async () => {
             const extraFieldError = await request(app).post('/admin/oneEmployee')
-            .auth(token.admin, { type: "bearer" })
-            .send({
-                employee_id: employee.employee_id,
-                "extra":"extra"
-            });
+                .auth(token.admin, { type: "bearer" })
+                .send({
+                    employee_id: employee.employee_id,
+                    "extra": "extra"
+                });
             expect(extraFieldError.status).toBe(401);
         });
     });
@@ -573,6 +579,18 @@ describe("POST /admin/addReview", () => {
                 .auth(token.admin, { type: "bearer" });
             expect(extraFieldError.status).toBe(401);
         });
+    });
+    it('no add more than 3 review for employee of same user', async () => {
+        const addReview2 = await request(app).post('/admin/addReview')
+            .send(review.add_review)
+            .auth(token.admin, { type: "bearer" });
+        const addReview3 = await request(app).post('/admin/addReview')
+            .send(review.add_review)
+            .auth(token.admin, { type: "bearer" });
+        const addReview4 = await request(app).post('/admin/addReview')
+            .send(review.add_review)
+            .auth(token.admin, { type: "bearer" });
+        expect(addReview4.status).toBe(400);
     });
 });
 
@@ -792,6 +810,16 @@ describe("POST /admin/replyReview", () => {
                 .auth(token.admin, { type: 'bearer' });
             expect(extraError.status).toBe(401);
         });
+    });
+    it('not take more than 1 reply for a review', async () => {
+        const reply = await request(app).post('/admin/replyAReview')
+            .send({
+                "review_id": review.reply_review_id,
+                "email": "usertest@1111.com",
+                "reply": "testreplyofTenChar"
+            })
+            .auth(token.admin, { type: 'bearer' });
+        expect(reply.status).toBe(400);
     });
 });
 
@@ -1112,6 +1140,30 @@ describe("POST /user/addReview", () => {
                 .auth(token.user, { type: "bearer" });
             expect(extraFieldError.status).toBe(401);
         });
+    });
+    it('no add more than 3 review for employee of same user', async () => {
+        const addReview2 = await request(app).post('/user/addReview')
+            .send({
+                "employee_id": employee.employee_id,
+                "email": "usertest@222.com",
+                "review": "test review from user "
+            })
+            .auth(token.user, { type: "bearer" });
+        const addReview3 = await request(app).post('/user/addReview')
+            .send({
+                "employee_id": employee.employee_id,
+                "email": "usertest@222.com",
+                "review": "test review from user "
+            })
+            .auth(token.user, { type: "bearer" });
+        const addReview4 = await request(app).post('/user/addReview')
+            .send({
+                "employee_id": employee.employee_id,
+                "email": "usertest@222.com",
+                "review": "test review from user "
+            })
+            .auth(token.user, { type: "bearer" });
+        expect(addReview4.status).toBe(400);
     });
 });
 
@@ -1744,11 +1796,11 @@ describe("DELETE /admin/delEmployee", () => {
         });
         it('with extra field', async () => {
             const extraError = await request(app).delete("/admin/delEmployee")
-            .auth(token.admin, { type: 'bearer' })
-            .send({
-                employee_id: employee.employee_id,
-                extra:"extra"
-            });
+                .auth(token.admin, { type: 'bearer' })
+                .send({
+                    employee_id: employee.employee_id,
+                    extra: "extra"
+                });
             expect(extraError.status).toBe(401);
         });
     });
