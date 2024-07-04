@@ -10,7 +10,7 @@ const user_schema = new mongoose.Schema({
     email: {
         type: String,
         require: [true, "Please enter Email"],
-        validate: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+        match:[/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "please enter valid email"],
         max: [35, "Please enter email within 35 letters."],
         unique: true
     },

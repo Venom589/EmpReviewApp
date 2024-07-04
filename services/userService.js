@@ -73,28 +73,11 @@ class UserService {
                 });
                 await User.findByIdAndUpdate(user._id, user);
             }
-            await Review.create(reviewData);
+            const newReview = await Review.create(reviewData);
+            return newReview;
         } catch (error) {
             console.log("Add review service error ::", error);
             throw new Error(`Add review service error ::${error.message}`, error);
-        }
-    }
-    async editReview(data) {
-        try {
-            const user = await User.findOne({ email: data.email });
-            if (user == null) {
-                throw new Error("User not found :: ");
-            }
-            const review = await Review.findOne({ _id: data.review_id, user: (String)(user._id) });
-            if (review == null) {
-                throw new Error("Review not found :: ");
-            }
-            if (data.review) {
-                await Review.findByIdAndUpdate(review._id, { review: data.review });
-            }
-        } catch (error) {
-            console.log("Edit review service error ::", error);
-            throw new Error(`Edit review service error ::${error.message}`, error);
         }
     }
     async userCreation(data) {

@@ -14,7 +14,7 @@ class CommonService {
             if (user == null) {
                 throw new Error("User not found");
             }
-            const passCheck = bcrypt.compare(data.password, user.password);
+            const passCheck = bcrypt.compareSync(data.password, user.password);
             if (passCheck == false) {
                 throw new Error("Incorrect Password");
             }

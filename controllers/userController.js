@@ -1,5 +1,6 @@
 const UserService = require('../services/userService');
 const CommonService = require('../services/commonService');
+const ReviewService = require('../services/reviewService');
 
 class UserController {
 
@@ -41,8 +42,8 @@ class UserController {
             if (!req.body.employee_id) {
                 throw new Error("Employee Id not found ::");
             }
-            await UserService.addReview(req.body);
-            res.sendStatus(200);
+            const review = await UserService.addReview(req.body);
+            res.status(200).json(review);
         } catch (error) {
             console.log("AddReview error :: ", error);
             res.sendStatus(400);
@@ -53,7 +54,7 @@ class UserController {
             if (!req.body.review_id) {
                 throw new Error("Review Id not found ::");
             }
-            await UserService.editReview(req.body);
+            await ReviewService.editReview(req.body);
             res.sendStatus(200);
         } catch (error) {
             console.log("Edit Review error :: ", error);
