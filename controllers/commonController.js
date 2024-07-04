@@ -1,40 +1,39 @@
-const main_controller = require('./mainController');
+const ReviewService = require('../services/reviewService');
+const CommonService = require('../services/commonService');
 
-class CommonController extends main_controller {
-    constructor() {
-        super();
-    }
-    AllEmployee = async (req, res) => {
+class CommonController {
+
+    async allEmployee(req, res) {
         try {
-            let data = await this.commonService.AllEmploye();
-            res.status(200).json(data);
+            const data = await CommonService.allEmployee();
+            return res.status(200).json(data);
         } catch (error) {
-            console.log("AllEmploye error :: ", error);
-            res.sendStatus(400);
+            console.log("All employee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    SelectEmploye = async (req, res) => {
+    async selectEmployee(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            let data = await this.commonService.SelectEmploye(req.body);
-            res.status(200).json(data);
+            const data = await CommonService.selectEmployee(req.body);
+            return res.status(200).json(data);
         } catch (error) {
-            console.log("select one Employe error :: ", error);
-            res.sendStatus(400);
+            console.log("select one employee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    AddReview = async (req, res) => {
+    async addReview(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            await this.reviewService.AddAnonymousReview(req.body);
-            res.sendStatus(200);
+            await ReviewService.addAnonymousReview(req.body);
+            return res.sendStatus(201);
         } catch (error) {
             console.log("AddReview error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
 }

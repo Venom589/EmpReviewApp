@@ -1,88 +1,94 @@
-const main_service = require('./mainService');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const { roles } = require('../constants/roles');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-class CommonService extends main_service{
-    constructor(){
-        super();
-    }
-    
-    Login = async(data) =>{
+class CommonService {
+
+    async login(data) {
         try {
             let token = null;
-            let user = await this.user.findOne({email:data.email})
-            .select("name email role");
-            if(user == null){
+            const user = await User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found");
             }
-            if(user.role == "admin"){
-                token = jwt.sign({user:user.name},process.env.ADMIN_JWT_SECRET,{expiresIn:"1h"});
+            const passCheck = bcrypt.compareSync(data.password, user.password);
+            if (passCheck == false) {
+                throw new Error("Incorrect Password");
             }
-            if(user.role == "user"){
-                token = jwt.sign({user:user.name},process.env.USER_JWT_SECRET,{expiresIn:"1h"});
+            if (user.role == roles.ADMIN) {
+                token = jwt.sign({ user: user.name }, process.env.ADMIN_JWT_SECRET, { expiresIn: "1h" });
             }
-            if(token == null){
+            if (user.role == roles.USER) {
+                token = jwt.sign({ user: user.name }, process.env.USER_JWT_SECRET, { expiresIn: "1h" });
+            }
+            if (token == null) {
                 throw new Error("Token not created :: ");
             }
-            let userData = {
-                "name":user.name,
-                "email":user.email,
-                "role":user.role,
-                "token":token
+            const userData = {
+                "name": user.name,
+                "email": user.email,
+                "role": user.role,
+                "token": token
             }
             return userData;
         } catch (error) {
-            throw new Error("login service error ::"+ error.message,error);
+            console.log("login service error ::", error);
+            throw new Error(`login service error ::${error.message}`, error);
         }
     }
-    CheckUser = async(data) =>{
+    async checkUser(data) {
         try {
-            let userData = this.user.findOne({email:data.email});
-            if(user == null){
+            const user = await User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found :: ");
             }
-            return userData;
+            return user;
         } catch (error) {
-            throw new Error("login service error ::"+ error.message,error);
+            console.log("Check user service error ::", error);
+            throw new Error(`Check user service error ::${error.message}`, error);
         }
     }
-    AllEmploye = async() =>{
+    async allEmployee() {
         try {
-            let employees = await this.employe.find().select(" _id name work_group position");
-            let allEmployes = [];
+            const employees = await Employee.find();
+            const allEmployees = [];
             for (let item of employees) {
-                allEmployes.push({
+                allEmployees.push({
                     employee: item,
-                    reviews: await this.review.aggregate([
+                    reviews: await Review.aggregate([
                         {
-                            $match: { employe_id: item._id }
+                            $match: { employee_id: item._id }
                         },
                         {
-                            $count: "users"
+                            $count: "count"
                         }
                     ])
                 });
             }
-            return allEmployes;
+            return allEmployees;
         } catch (error) {
-            throw new Error("All employe service error ::"+ error.message,error);
+            console.log("All employee service error ::", error);
+            throw new Error(`All employee service error ::${error.message}`, error);
         }
     }
-    SelectEmploye = async (data) => {
+    async selectEmployee(data) {
         try {
-            let oneEmploye = await this.employe.findById(data.employe_id)
-                .select("_id name work_group position");
-            if (oneEmploye == null) {
-                throw new Error("Employe not exist :: ");
+            const employee = await Employee.findById(data.employee_id);
+            if (employee == null) {
+                throw new Error("Employee not exist :: ");
             }
-            let allReviews = await this.review.aggregate([
+            let allReviews = await Review.aggregate([
                 {
-                    $match: { employe_id: oneEmploye._id }
+                    $match: { employee_id: employee._id }
                 },
                 {
                     $project: {
                         "_id": 1,
                         "user": 1,
-                        "employe_id": 1,
+                        "employee_id": 1,
                         "review": 1,
                         "reply": 1,
                         "created_at": {
@@ -102,38 +108,11 @@ class CommonService extends main_service{
                     }
                 }
             ]);
-            // let anonymousReview = await this.review.aggregate([
-            //     {
-            //         $match: { employe_id: oneEmploye._id }
-            //     },
-            //     {
-            //         $project: {
-            //             "_id": 1,
-            //             "user": 1,
-            //             "employe_id": 1,
-            //             "review": 1,
-            //             // "reply": 1,
-            //             "created_at": {
-            //                 $dateToString: {
-            //                     date: "$createdAt",
-            //                     format: "%Y-%m-%dT%H:%M:%S",
-            //                     timezone: "Asia/Kolkata"
-            //                 }
-            //             },
-            //             "updated_at": {
-            //                 $dateToString: {
-            //                     date: "$updatedAt",
-            //                     format: "%Y-%m-%dT%H:%M:%S",
-            //                     timezone: "Asia/Kolkata"
-            //                 }
-            //             }
-            //         }
-            //     }
-            // ]);
-            let selectedEmploye = { employe: oneEmploye, reviws: allReviews };
-            return selectedEmploye;
+            const selectedEmployee = { employee: employee, review: allReviews };
+            return selectedEmployee;
         } catch (error) {
-            throw new Error("Select one Employee service error ::"+ error.message, error);
+            console.log("Select one employee service error ::", error);
+            throw new Error(`Select one employee service error ::${error.message}`, error);
         }
     }
 }

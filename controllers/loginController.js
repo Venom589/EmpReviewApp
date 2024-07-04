@@ -1,62 +1,42 @@
-const main_controller = require('./mainController');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const User = require('../model/user');
+const AdminService = require('../services/adminService');
+const UserService = require('../services/userService');
+const CommonService = require('../services/commonService');
+const { roles } = require('../constants/roles');
 
-class LoginController extends main_controller {
-    constructor() {
-        super();
-    }
+class LoginController {
 
-    Signup = async (req, res) => {
+    async signup(req, res) {
         try {
-            if(!req.body.email){
+            if (!req.body.email) {
                 throw new Error("Name not found");
             }
-            let user = await this.user.findOne({email:req.body.email});
-            if(user != null){
+            const user = await User.findOne({ email: req.body.email });
+            if (user != null) {
                 throw new Error("User with this mail already exist");
             }
-            if(req.body.role == "admin"){
-                await this.adminServis.AdminCreation(req.body);
+            if (req.body.role == roles.ADMIN) {
+                await AdminService.adminCreation(req.body);
             }
-            if(req.body.role == "user"){
-                await this.userService.UserCreation(req.body);
+            if (req.body.role == roles.USER) {
+                await UserService.userCreation(req.body);
             }
-            res.sendStatus(200);
+            return res.sendStatus(201);
         } catch (error) {
             console.log("Sign up error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
-    Login = async (req, res) => {
+    async login(req, res) {
         try {
-            if(!req.body.email || !req.body.password || !req.body.role){
+            if (!req.body.email || !req.body.password ) {
                 throw new Error("Request data not received :: ");
             }
-            let data = await this.commonService.Login(req.body);
-            res.status(200).json(data);
+            const data = await CommonService.login(req.body);
+            return res.status(200).json(data);
         } catch (error) {
             console.log("Login error :: ", error);
-            res.sendStatus(400);
-        }
-    }
-    //left
-    Logout = async (req, res) => {
-        try {
-            // if(req.params.role == "admin"){
-                if(req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer"){
-                    jwt.verify(req.headers.authorization.split(" ")[1],process.env.ADMIN_JWT_SECRET
-                        ,(err, decoded) => {
-                            if(err){throw new Error("token not verified");}
-                            decoded.exp;
-                            console.log(decoded.exp); 
-                        });
-                }
-            // }
-            res.sendStatus(200);
-        } catch (error) {
-            console.log("AllEmploye error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
 }

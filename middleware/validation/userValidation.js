@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 
 class UserValidation {
 
-    work_group = ["Group_A", "Group_B", "Group_C", "Group_D"];
+    workGroup = ["Group_A", "Group_B", "Group_C", "Group_D"];
 
     position = ["Intern", "Junior", "Senior", "Head"];
 
-    IsValidId = (value, helpers) => {
+    isValidId = (value, helpers) => {
         try {
             if (!mongoose.Types.ObjectId.isValid(value)) {
                 throw new Error;
@@ -18,18 +18,18 @@ class UserValidation {
         }
     }
 
-    select_employe = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validation')
+    selectEmployee = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
             })
     });
 
-    add_review = joi.object({
-        employe_id: joi.string()
-            .custom(this.IsValidId, 'employe_id validation')
+    addReview = joi.object({
+        employee_id: joi.string()
+            .custom(this.isValidId, 'employee_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'
@@ -45,7 +45,7 @@ class UserValidation {
             .required()
     });
 
-    edit_name = joi.object({
+    editName = joi.object({
         name: joi.string()
             .min(4)
             .max(20),
@@ -56,9 +56,9 @@ class UserValidation {
             .max(35)
     });
 
-    edit_review = joi.object({
+    editReview = joi.object({
         review_id: joi.string()
-            .custom(this.IsValidId, 'review_id validation')
+            .custom(this.isValidId, 'review_id validation')
             .required()
             .messages({
                 'any.invalid':'Enter an valid mongoose object id'

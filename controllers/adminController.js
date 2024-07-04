@@ -1,146 +1,147 @@
-const main_controller = require('./mainController');
+const AdminService = require('../services/adminService');
+const ReviewService = require('../services/reviewService');
+const UserService = require('../services/userService');
+const CommonService = require('../services/commonService');
 
-class AdminController extends main_controller {
-    constructor() {
-        super();
-    }
 
-    AllEmploye = async (req, res) => {
+class AdminController {
+
+    async allEmployee(req, res) {
         try {
-            let data = await this.commonService.AllEmploye();
-            res.status(200).json(data);
+            const data = await CommonService.allEmployee();
+            return res.status(200).json(data);
         } catch (error) {
-            console.log("AllEmploye error :: ", error);
-            res.sendStatus(400);
+            console.log("AllEmployee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    SelectEmploye = async (req, res) => {
+    async selectEmployee(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            let data = await this.commonService.SelectEmploye(req.body);
-            res.status(200).json(data);
+            const data = await CommonService.selectEmployee(req.body);
+            return res.status(200).json(data);
         } catch (error) {
-            console.log("select one Employe error :: ", error);
-            res.sendStatus(400);
+            console.log("select one employee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    CreateEmploye = async (req, res) => {
+    async createEmployee(req, res) {
         try {
             if (!req.body.name) {
                 throw new Error("Request body not found");
             }
-            let newEmoloye = await this.adminService.CreateEmploye(req.body);
-            res.status(200).json(newEmoloye);
+            const data = await AdminService.createEmployee(req.body);
+            return res.status(201).json(data);
         } catch (error) {
-            console.log("Create Employe error :: ", error);
-            res.sendStatus(400);
+            console.log("Create employee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    EditEmploye = async (req, res) => {
+    async editEmployee(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            let data = await this.adminService.UpdateEmploye(req.body);
-            res.sendStatus(200);
+            await AdminService.updateEmployee(req.body);
+            return res.sendStatus(200);
         } catch (error) {
-            console.log("Edit employe error :: ", error);
-            res.sendStatus(400);
+            console.log("Edit employee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    DeleteEmploye = async (req, res) => {
+    async deleteEmployee(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            await this.adminService.DeleteEmploye(req.body);
-            res.sendStatus(200);
+            await AdminService.deleteEmployee(req.body);
+            return res.sendStatus(200);
         } catch (error) {
-            console.log("AllEmploye error :: ", error);
-            res.sendStatus(400);
+            console.log("AllEmployee error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    AddReview = async (req, res) => {
+    async addReview(req, res) {
         try {
-            if (!req.body.employe_id) {
-                throw new Error("Employe Id not found ::");
+            if (!req.body.employee_id) {
+                throw new Error("Employee Id not found ::");
             }
-            let data = await this.reviewService.AddReview(req.body);
-            res.status(200).json(data);
+            const data = await ReviewService.addReview(req.body);
+            return res.status(201).json(data);
         } catch (error) {
             console.log("AddReview error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
-    EditReview = async (req, res) => {
+    async editReview(req, res) {
         try {
             if (!req.body.review_id) {
                 throw new Error("Review Id not found ::");
             }
-            await this.reviewService.EditReview(req.body);
-            res.sendStatus(200);
+            await ReviewService.editReview(req.body);
+            return res.sendStatus(200);
         } catch (error) {
             console.log("Edit Review error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
-    DeleteReview = async (req, res) => {
+    async deleteReview(req, res) {
         try {
             if (!req.body.review_id) {
                 throw new Error("Review id not find");
             }
-            await this.reviewService.DeleteReview(req.body);
-            res.sendStatus(200);
+            await ReviewService.deleteReview(req.body);
+            return res.sendStatus(200);
         } catch (error) {
             console.log("Delete review error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
-    ReplyReview = async (req, res) => {
+    async replyReview(req, res) {
         try {
             if (!req.body.review_id) {
                 throw new Error("Review Id not found ::");
             }
-            await this.reviewService.ReplyReview(req.body);
-            res.sendStatus(200);
+            await ReviewService.replyReview(req.body);
+            return res.sendStatus(200);
         } catch (error) {
             console.log("Reply review error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
-    EditReply = async (req, res) => {
+    async editReply(req, res) {
         try {
             if (!req.body.review_id) {
                 throw new Error("Review Id not found ::");
             }
-            await this.reviewService.EditReply(req.body);
-            res.sendStatus(200);
+            await ReviewService.editReply(req.body);
+            return res.sendStatus(200);
         } catch (error) {
-            console.log("Edit employe error :: ", error);
-            res.sendStatus(400);
+            console.log("Edit reply error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    AllUsers = async (req, res) => {
+    async allUsers(req, res) {
         try {
-            let data = await this.userService.AllUsers();
-            res.status(200).json(data);
+            const data = await UserService.allUsers();
+            return res.status(200).json(data);
         } catch (error) {
-            console.log("AllEmploye error :: ", error);
-            res.sendStatus(400);
+            console.log("All users error :: ", error);
+            return res.sendStatus(400);
         }
     }
-    DeleteUser = async (req, res) => {
+    async deleteUser(req, res) {
         try {
             if (!req.body.user_id) {
                 throw new Error("User id not found :: ")
             }
-            await this.userService.DeleteUser(req.body);
-            res.sendStatus(200);
+            await UserService.deleteUser(req.body);
+            return res.sendStatus(200);
         } catch (error) {
             console.log("Delete user error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
 }

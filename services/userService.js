@@ -1,104 +1,98 @@
-const main_service = require('./mainService');
+const Employee = require('../model/employee');
+const Review = require('../model/review');
+const User = require('../model/user');
+const { roles } = require('../constants/roles');
 const bcrypt = require('bcrypt');
 
-class UserService extends main_service {
-    constructor(){
-        super();
-    }
-    AllUsers = async () => {
+class UserService {
+
+    async allUsers() {
         try {
-            let allUsers = await this.user.find().select("_id name email role reviewed");
-            return allUsers;
+            const users = await User.find().select("_id name email role reviewed");
+            return users;
         } catch (error) {
-            throw new Error("All user service Error ::"+ error.message,error);
+            console.log("All user service Error ::", error);
+            throw new Error(`All user service Error ::${error.message}`, error);
         }
     }
-    DeleteUser = async (data) => {
+    async deleteUser(data) {
         try {
-            let checkUser = await this.user.findById(data.user_id);
-            if (checkUser == null) {
+            const deleteUser = await User.findById(data.user_id);
+            if (deleteUser == null) {
                 throw new Error("User not found");
             }
-            await this.review.deleteMany({ user: (String)(checkUser._id) });
-            await this.user.findByIdAndDelete(checkUser._id);
+            if (deleteUser.role == roles.ADMIN) {
+                throw new Error("Cannot delete admin user");
+            }
+            if (deleteUser.reviewed != null || deleteUser.reviewed != undefined) {
+                await Review.deleteMany({ user: (String)(deleteUser._id) });
+            }
+            await User.findByIdAndDelete(deleteUser._id);
         } catch (error) {
-            throw new Error("Delete user service Error ::"+ error.message,error);
+            console.log("Delete user service Error ::", error);
+            throw new Error(`Delete user service Error ::${error.message}`, error);
         }
     }
-    ChangeName = async(data)=>{
+    async changeName(data) {
         try {
-            let userData = await this.user.findOne({ email: data.email });
-            if (userData == null) {
+            const user = await User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found :: ");
             }
             if (data.name) {
-                userData.name = data.name;
-                await this.user.findByIdAndUpdate(userData._id, { name: userData.name });
+                await User.findByIdAndUpdate(user._id, { name: data.name });
             }
         } catch (error) {
-            throw new Error("Change name service error ::"+ error.message, error);
+            console.log("Change name service error ::", error);
+            throw new Error(`Change name service error ::${error.message}`, error);
         }
     }
-    AddReview = async(data)=>{
+    async addReview(data) {
         try {
-            let checkUser = await this.user.findOne({ email: data.email });
-            if (checkUser == null) {
+            const user = await User.findOne({ email: data.email });
+            if (user == null) {
                 throw new Error("User not found :: ");
             }
-            let checkEmploye = await this.employe.findById(data.employe_id);
-            if (checkEmploye == null) {
-                throw new Error("Employe not found :: ");
+            const employee = await Employee.findById(data.employee_id);
+            if (employee == null) {
+                throw new Error("Employee not found :: ");
             }
-            let checkReviews = await this.review.find({ employe_id: data.employe_id, user:checkUser._id });
-            if (checkReviews.length == 3) {
+            const review = await Review.find({ employee_id: employee._id, user: user._id });
+            if (review.length == 3) {
                 throw new Error("you have already review 3 time you cannot review now.");
             }
-            let reveiwData = {
-                user: checkUser._id,
-                employe_id: checkEmploye._id,
+            const reviewData = {
+                user: user._id,
+                employee_id: employee._id,
                 review: data.review,
             }
-            if (checkReviews.length == 0) {
-                checkUser.reviewed.push({
-                    employe_id: checkEmploye._id
+            if (review.length == 0) {
+                const updateUserReviewed = user.reviewed;
+                updateUserReviewed.push({
+                    employee_id: employee._id
                 });
-                await this.user.findByIdAndUpdate(checkUser._id, checkUser);
+                await User.findByIdAndUpdate(user._id, user);
             }
-            await this.review.create(reveiwData);
+            const newReview = await Review.create(reviewData);
+            return newReview;
         } catch (error) {
-            throw new Error("Add review service error ::"+ error.message, error);
+            console.log("Add review service error ::", error);
+            throw new Error(`Add review service error ::${error.message}`, error);
         }
     }
-    EditReview = async(data)=>{
+    async userCreation(data) {
         try {
-            let checkUser = await this.user.findOne({ email: data.email });
-            if (checkUser == null) {
-                throw new Error("User not found :: ");
-            }
-            let checkReview = await this.review.findOne({ _id: data.review_id, user: (String)(checkUser._id) });
-            if (checkReview == null) {
-                throw new Error("Review not found :: ");
-            }
-            if (data.review) {
-                checkReview.review = data.review;
-                await this.review.findByIdAndUpdate(checkReview._id, checkReview);
-            }
-        } catch (error) {
-            throw new Error("Edit review service error ::"+ error.message, error);
-        }
-    }
-    UserCreation = async(data) =>{
-        try {
-            let encPassword = await bcrypt.hash(data.password, 15);
-            let newUser = {
+            const encPassword = await bcrypt.hash(data.password, 15);
+            const newUser = {
                 name: data.name,
                 email: data.email,
                 password: encPassword,
                 role: data.role
             }
-            await this.user.create(newUser);
+            await User.create(newUser);
         } catch (error) {
-            throw new Error("User creation service error ::"+ error.message, error);
+            console.log("User creation service error ::", error);
+            throw new Error(`User creation service error ::${error.message}`, error);
         }
     }
 }
