@@ -586,7 +586,6 @@ describe("PATCH /admin/editReview", () => {
                 "review": "testupdate1djsdcjsdkj"
             })
             .auth(token.admin, { type: "bearer" });
-        console.log(editReview.error);
         expect(editReview.status).toBe(200);
     });
     it("should run successfully without review field", async () => {

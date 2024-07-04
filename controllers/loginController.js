@@ -21,10 +21,10 @@ class LoginController {
             if (req.body.role == roles.USER) {
                 await UserService.userCreation(req.body);
             }
-            res.sendStatus(201);
+            return res.sendStatus(201);
         } catch (error) {
             console.log("Sign up error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
     async login(req, res) {
@@ -33,10 +33,10 @@ class LoginController {
                 throw new Error("Request data not received :: ");
             }
             const data = await CommonService.login(req.body);
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch (error) {
             console.log("Login error :: ", error);
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
 }
