@@ -2,12 +2,11 @@ const request = require('supertest');
 const app = require('../app');
 const mongoose = require('mongoose');
 const dot_env = require('dotenv');
-const testEnv = dot_env.config({ path: './config/config.env' });
+dot_env.config({ path: './config/config.env' });
 const { admin, user, token, review, employee } = require('../constants/apiConstants');
-const { editEmployee } = require('../controllers/adminController');
 
 beforeAll(() => {
-    mongoose.connect('mongodb://127.0.0.1:27017/TestEmpReview');
+    mongoose.connect(process.env.TESTDB);
 });
 afterAll(() => {
     mongoose.connection.dropDatabase();
