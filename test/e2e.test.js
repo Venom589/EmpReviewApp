@@ -584,9 +584,11 @@ describe("POST /admin/addReview", () => {
         const addReview2 = await request(app).post('/admin/addReview')
             .send(review.add_review)
             .auth(token.admin, { type: "bearer" });
+            expect(addReview2.status).toBe(201);
         const addReview3 = await request(app).post('/admin/addReview')
             .send(review.add_review)
             .auth(token.admin, { type: "bearer" });
+            expect(addReview3.status).toBe(201);
         const addReview4 = await request(app).post('/admin/addReview')
             .send(review.add_review)
             .auth(token.admin, { type: "bearer" });
@@ -1149,6 +1151,7 @@ describe("POST /user/addReview", () => {
                 "review": "test review from user "
             })
             .auth(token.user, { type: "bearer" });
+            expect(addReview2.status).toBe(201);
         const addReview3 = await request(app).post('/user/addReview')
             .send({
                 "employee_id": employee.employee_id,
@@ -1156,6 +1159,7 @@ describe("POST /user/addReview", () => {
                 "review": "test review from user "
             })
             .auth(token.user, { type: "bearer" });
+            expect(addReview3.status).toBe(201);
         const addReview4 = await request(app).post('/user/addReview')
             .send({
                 "employee_id": employee.employee_id,
